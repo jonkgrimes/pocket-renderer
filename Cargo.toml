@@ -5,3 +5,10 @@ authors = ["Jon Grimes <jong@spiceworks.com>"]
 
 [dependencies]
 image = "*"
+
+[dev-dependencies]
+bencher = "*"
+
+[[bench]]
+name = "line"
+harness = false
