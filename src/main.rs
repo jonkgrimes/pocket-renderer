@@ -14,6 +14,6 @@ fn line<P: Pixel + 'static>(imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>) {
 fn main() {
     let mut imgbuf = ImageBuffer::new(100, 100);
     line(&mut imgbuf);
-    let ref mut fout = File::create(&Path::new("image.png")).unwrap();
+    let ref mut fout = File::create(&Path::new("rendered.png")).unwrap();
     let _ = image::ImageRgb8(imgbuf).save(fout, image::PNG);
 }
