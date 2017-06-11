@@ -5,15 +5,15 @@ use std::path::Path;
 use std::vec::Vec;
 use image::{ImageBuffer, Pixel};
 
-const WHITE: [u8; 3] = [255 as u8, 0 as u8, 0 as u8];
+const WHITE: [u8; 3] = [255 as u8, 255 as u8, 255 as u8];
 
-fn line<P: Pixel + 'static>(imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>) {
-    imgbuf.put_pixel(45, 67, image::Rgb(WHITE));
+fn line<P: Pixel + 'static>(imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>, pixel: P) {
+    imgbuf.put_pixel(45, 67, pixel);
 }
 
 fn main() {
     let mut imgbuf = ImageBuffer::new(100, 100);
-    line(&mut imgbuf);
+    line(&mut imgbuf, image::Rgb(WHITE));
     let ref mut fout = File::create(&Path::new("rendered.png")).unwrap();
     let _ = image::ImageRgb8(imgbuf).save(fout, image::PNG);
 }
