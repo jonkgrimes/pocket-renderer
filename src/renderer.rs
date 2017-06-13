@@ -1,33 +1,41 @@
 use image::{ImageBuffer, Pixel};
 
+#[derive(Debug)]
+struct Point {
+    x: i32,
+    y: i32
+}
+
 pub fn line<P: Pixel + 'static>(x0: i32, y0: i32, x1: i32, y1: i32, imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>, pixel: P) {
     let mut t = 0.0; 
     let mut steep = false;
-    let (temp_x0, temp_y0) = (x0, y0);
-    let (temp_x1, temp_y1) = (x1, y1);
+    let mut point0 = Point { x: x0, y: y0 };
+    let mut point1 = Point { x: x1, y: y1 };
+
+    println!("Original values: {:?}, {:?}", point0, point1);
 
     if (x0-x1).abs() < (y0-y1).abs() { // if line is steep, transpose the image
-        let (x0, x1) = (y0, y1);
-        let (y0, y1) = (temp_x0, temp_x1);
-        println!("x0 = {} y0 = {}, x1 = {} y1 = {}", x0, y0, x1, y1);
+        println!("Transposing image");
+        point0 = Point { x: y0, y: x0  };
+        point1 = Point { x: y1, y: x1  };
+        println!("After transposition: {:?}, {:?}", point0, point1);
         steep = true;
     }
 
     if x0 > x1 { // make it left to right
-        let temp_x0 = x0;
-        let temp_y0 = y0;
-        let x0 = x1; let y0 = y1;
-        let y1 = temp_y0; let x1 = temp_x0;
-        println!("x0 = {} y0 = {}, x1 = {} y1 = {}", x0, y0, x1, y1);
+        println!("Draw left to right");
+        point0 = Point { x: x1, y: y1 };
+        point1 = Point { x: x0, y: y0 };
+        println!("After draw order: {:?}, {:?}", point0, point1);
     }
 
-    println!("x0 = {} y0 = {}, x1 = {} y1 = {}", x0, y0, x1, y1);
+    println!("Before drawing: {:?}, {:?}", point0, point1);
 
     let mut x = 0;
-    while x <= x1 {
-        let t = (x - x0) as f32/(x1 - x0) as f32;
-        let y = y0 as f32 * (1.0 - t) + y1 as f32 * t;
-        println!("x = {}, y = {}",x,y);
+    while x <= point1.x {
+        let t = (x - point0.x) as f32/(point1.x - point0.x) as f32;
+        let y = point0.y as f32 * (1.0 - t) + point1.y as f32 * t;
+        println!("x: {}, y: {}", x, y);
         if steep {
             imgbuf.put_pixel(y as u32, x as u32, pixel);
         } else {
