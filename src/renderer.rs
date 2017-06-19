@@ -30,21 +30,11 @@ pub fn line<P: Pixel + 'static>(x0: i32, y0: i32, x1: i32, y1: i32, imgbuf: &mut
     let mut x = point0.x;
     let mut y = point0.y;
 
-    let height = imgbuf.height();
-    let width = imgbuf.width();
-
-    println!("height = {}, width = {}", height, width);
     while x <= point1.x {
         if steep {
-            if valid_bounds(x, y, height, width) {
-                println!("steep x = {}, y = {}", x, y);
-                imgbuf.put_pixel(y as u32, x as u32, pixel);
-            }
+            imgbuf.put_pixel(y as u32, x as u32, pixel);
         } else {
-            if valid_bounds(x, y, height, width) {
-                println!("x = {}, y = {}", x, y);
-                imgbuf.put_pixel(x as u32, y as u32, pixel);
-            }
+            imgbuf.put_pixel(x as u32, y as u32, pixel);
         }
         error2 += derror2;
         if error2 > dx {
@@ -57,8 +47,4 @@ pub fn line<P: Pixel + 'static>(x0: i32, y0: i32, x1: i32, y1: i32, imgbuf: &mut
         }
         x += 1;
     }
-}
-
-fn valid_bounds(x: i32, y: i32, height: u32, width: u32) -> bool {
-    x < height as i32 || y < width as i32
 }
