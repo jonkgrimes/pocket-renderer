@@ -31,8 +31,8 @@ impl Model {
             }
 
             if values[0] == "f" {
-                println!("{}", values[1]);
-                let vert_index_list: Vec<u32> = values[1].split("/").map(|string| string.parse().unwrap());
+                let parse_index = |string: &str| string.parse().unwrap();
+                let vert_index_list: Vec<u32> = values[1].split("/").map(&parse_index).collect();
                 faces.push(vert_index_list);
             }
         }
