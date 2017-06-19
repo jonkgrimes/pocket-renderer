@@ -16,6 +16,7 @@ fn main() {
     let mut imgbuf = ImageBuffer::new(100, 100);
     renderer::line(20, 13, 40, 80, &mut imgbuf, image::Rgb(WHITE));
     let model = Model::new("models/african_head.obj");
+    println!("verts = {}, faces = {}", model.verts_len(), model.faces_len());
     let ref mut fout = File::create(&Path::new("rendered.png")).unwrap();
     let _ = image::ImageRgb8(imgbuf).save(fout, image::PNG);
 }
