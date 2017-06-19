@@ -8,8 +8,8 @@ use std::f32;
 use geometry::Vertex3;
 
 pub struct Model {
-    verts: Vec<Vertex3<f32>>,
-    faces: Vec<Vec<u32>>
+    pub verts: Vec<Vertex3<f32>>,
+    pub faces: Vec<Vec<u32>>
 }
 
 impl Model {
@@ -31,8 +31,10 @@ impl Model {
             }
 
             if values[0] == "f" {
-                let parse_index = |string: &str| string.parse().unwrap();
-                let vert_index_list: Vec<u32> = values[1].split("/").map(&parse_index).collect();
+                let mut vert_index_list: Vec<u32> = Vec::new();
+                vert_index_list.push(*parse_face_string(values[1]).get(0).unwrap());
+                vert_index_list.push(*parse_face_string(values[2]).get(0).unwrap());
+                vert_index_list.push(*parse_face_string(values[3]).get(0).unwrap());
                 faces.push(vert_index_list);
             }
         }
@@ -48,3 +50,10 @@ impl Model {
     }
 }
 
+fn parse_face_string(face_str: &str) -> Vec<u32> {
+    let parse_index = |string: &str| {
+        let value: u32 = string.parse().unwrap();
+        value - 1 // waveform object files start index at 1 rather than 0
+    };
+    face_str.split("/").map(&parse_index).collect()
+}
