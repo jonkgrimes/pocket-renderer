@@ -16,12 +16,13 @@ pub mod geometry;
 pub mod renderer;
 
 fn main() {
-    let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1); // hack to get over the out of bounds errors
+    let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1); // +1 hack to get over the out of bounds errors
     let model = Model::new("models/african_head.obj");
 
     println!("verts = {}, faces = {}", model.verts_len(), model.faces_len());
 
     for face in model.faces {
+        println!("{:?}", face);
         for index in 0..3 {
             let v0_index = *face.get(index).unwrap();
             let v0: &Vertex3<f32> = model.verts.get(v0_index as usize).unwrap();
@@ -31,6 +32,7 @@ fn main() {
             let y0 = (v0.y + 1.0) * (HEIGHT as f32 / 2.0);
             let x1 = (v1.x + 1.0) * (WIDTH as f32 / 2.0);
             let y1 = (v1.y + 1.0) * (HEIGHT as f32 / 2.0);
+            println!("{}, {} -> {}, {}", x0, y0, x1, y1);
             renderer::line(x0 as i32, y0 as i32, x1 as i32, y1 as i32, &mut imgbuf, image::Rgb(WHITE));
         }
     }

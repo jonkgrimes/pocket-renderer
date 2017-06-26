@@ -17,7 +17,8 @@ pub fn line<P: Pixel + 'static>(x0: i32, y0: i32, x1: i32, y1: i32, imgbuf: &mut
         steep = true;
     }
 
-    if x0 > x1 { // make it left to right
+    if point0.x > point1.x { // make it left to right
+        println!("Make left to right");
         point0 = Point { x: x1, y: y1 };
         point1 = Point { x: x0, y: y0 };
     }
