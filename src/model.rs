@@ -57,3 +57,16 @@ fn parse_face_string(face_str: &str) -> Vec<u32> {
     };
     face_str.split("/").map(&parse_index).collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_face_string_returns_correct_vector() {
+        let str = "1/2/3";
+        let expected = vec![0,1,2];
+        let actual = parse_face_string(str);
+        assert!(actual == expected);
+    }
+}
