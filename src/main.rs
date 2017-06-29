@@ -31,7 +31,21 @@ fn main() {
             let y0 = (v0.y + 1.0) * (HEIGHT as f32 / 2.0);
             let x1 = (v1.x + 1.0) * (WIDTH as f32 / 2.0);
             let y1 = (v1.y + 1.0) * (HEIGHT as f32 / 2.0);
-            renderer::line(x0 as i32, y0 as i32, x1 as i32, y1 as i32, &mut imgbuf, image::Rgb(WHITE));
+            if (x0 as i32 - x1 as i32) == (y0 as i32 - y1 as i32) {
+                println!("Perfect line");
+                println!("{:?}",v0);
+                println!("{:?}",v1);
+                println!("x0 = {}", x0);
+                println!("x0 as i32 = {}", x0 as i32);
+                println!("y0 = {}", y0);
+                println!("y0 as i32 = {}", y0 as i32);
+                println!("x1 = {}", x1);
+                println!("x1 as i32 = {}", x1 as i32);
+                println!("y1 = {}", y1);
+                println!("y1 as i32 = {}", y1 as i32);
+            } else {
+                renderer::line(x0 as i32, y0 as i32, x1 as i32, y1 as i32, &mut imgbuf, image::Rgb(WHITE));
+            }
         }
     }
 
