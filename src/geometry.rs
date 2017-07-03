@@ -1,3 +1,6 @@
+use std::ops::Add;
+use std::ops::Mul;
+
 #[derive(Debug, Copy, Clone)]
 pub struct Vertex3<T> {
     pub x: T,
@@ -11,8 +14,63 @@ pub struct Vertex2<T> {
     pub y: T
 }
 
+pub struct Scalar {
+    pub value: f32
+}
+
 impl<T> Vertex2<T> {
     pub fn new(x: i32, y: i32) -> Vertex2<i32> {
         Vertex2 { x: x, y: y }
+    }
+}
+
+impl Add for Vertex2<u32> {
+    type Output = Vertex2<u32>;
+
+    fn add(self, other: Vertex2<u32>) -> Vertex2<u32> {
+        Vertex2::<u32> {
+            x: self.x + other.x,
+            y: self.y + other.y
+        }
+    }
+}
+
+impl Mul<Vertex2<u32>> for Scalar {
+    type Output = Vertex2<u32>;
+
+    fn mul(self, rhs: Vertex2<u32>) -> Vertex2<u32> {
+        Vertex2::<u32> {
+            x: (self.value * rhs.x as f32) as u32,
+            y: (self.value * rhs.y as f32) as u32
+        }
+    }
+}
+
+impl PartialEq for Vertex2<u32> {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn adding_two_2d_vectors() {
+        let a = Vertex2::<u32> { x: 1, y: 1 };
+        let b = Vertex2::<u32> { x: 1, y: 1 };
+        let actual = a + b;
+        let expected = Vertex2::<u32> { x: 2, y: 2 };
+        assert!(actual == expected);
+    }
+
+    #[test]
+    fn multiplying_2d_vector_by_float() {
+        let a = Vertex2::<u32> { x: 10, y: 10 };
+        let b = Scalar { value: 0.5 };
+        let actual = b * a;
+        let expected = Vertex2::<u32> { x: 5, y: 5 };
+        assert!(actual == expected);
     }
 }

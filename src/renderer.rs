@@ -27,10 +27,17 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>, vert1: &Vertex2<i32>, 
     if v1.y > v2.y {
         mem::swap(&mut v1, &mut v2);
     }
-    
-    line(v0.x, v0.y, v1.x, v1.y, imgbuf, pixel);
-    line(v1.x, v1.y, v2.x, v2.y, imgbuf, pixel);
-    line(v2.x, v2.y, v0.x, v0.y, imgbuf, pixel);
+
+    let total_height = v2.y - v0.y;
+    let mut y = v2.y;
+
+    while y <= v1.y {
+        let segment_height = v1.y - v0.y + 1;
+        let alpha = (y - v0.y) as f32 / total_height as f32;
+        let beta  = (y - v0.y) as f32 / segment_height as f32;
+        // imgbuf.put_pixel(y as u32, x as u32, pixel);
+        y += 1;
+    }
 }
 
 pub fn line<P: Pixel + 'static>(x0: i32, y0: i32, x1: i32, y1: i32, imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>, pixel: P) {
