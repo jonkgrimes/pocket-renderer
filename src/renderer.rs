@@ -1,9 +1,16 @@
+use geometry::Vertex2;
 use image::{ImageBuffer, Pixel};
 
 #[derive(Debug)]
 struct Point {
     x: i32,
     y: i32
+}
+
+pub fn triangle<P: Pixel + 'static>(v0: &Vertex2<i32>, v1: &Vertex2<i32>, v2: &Vertex2<i32>, imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>, pixel: P) {
+    line(v0.x, v0.y, v1.x, v1.y, imgbuf, pixel);
+    line(v1.x, v1.y, v2.x, v2.y, imgbuf, pixel);
+    line(v0.x, v0.y, v2.x, v2.y, imgbuf, pixel);
 }
 
 pub fn line<P: Pixel + 'static>(x0: i32, y0: i32, x1: i32, y1: i32, imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>, pixel: P) {
@@ -18,8 +25,10 @@ pub fn line<P: Pixel + 'static>(x0: i32, y0: i32, x1: i32, y1: i32, imgbuf: &mut
     }
 
     if point0.x > point1.x { // make it left to right
-        point0 = Point { x: x1, y: y1 };
-        point1 = Point { x: x0, y: y0 };
+        let temp_x = point0.x;
+        let temp_y = point0.y;
+        point0 = Point { x: point1.x, y: point1.y };
+        point1 = Point { x: temp_x, y: temp_y };
     }
 
     let dx = point1.x - point0.x;
