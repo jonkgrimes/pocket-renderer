@@ -17,7 +17,7 @@ pub mod geometry;
 pub mod renderer;
 
 fn main() {
-    let mut imgbuf = ImageBuffer::new(WIDTH, HEIGHT); // +1 hack to get over the out of bounds errors
+    let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1); // +1 hack to get over the out of bounds errors
 
     let t0: [Vertex2<i32>; 3] = [Vertex2::<i32>::new(10, 70), Vertex2::<i32>::new(50, 160), Vertex2::<i32>::new(70, 80)];
     let t1: [Vertex2<i32>; 3] = [Vertex2::<i32>::new(180, 50), Vertex2::<i32>::new(150, 1), Vertex2::<i32>::new(70, 180)];
