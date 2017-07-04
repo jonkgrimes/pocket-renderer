@@ -16,6 +16,10 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>, vert1: &Vertex2<i32>, 
     let mut v1 = vert1;
     let mut v2 = vert2;
 
+    if v0.y == v1.y && v0.y == v2.y {
+        return;
+    }
+
     if v0.y > v1.y {
         mem::swap(&mut v0, &mut v1);
     }
@@ -27,33 +31,35 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>, vert1: &Vertex2<i32>, 
     }
 
     let total_height = v2.y - v0.y;
-    // bottom half of the triangle
-    for y in v0.y..(v1.y + 1) {
-        let segment_height = v1.y - v0.y + 1;
-        let alpha = Scalar { value: (y - v0.y) as f32 / total_height as f32 };
-        let beta  = Scalar { value: (y - v0.y) as f32 / segment_height as f32 };
-        let mut a: Vertex2<i32> = *v0 + (alpha * (*v2 - *v0));
-        let mut b: Vertex2<i32> = *v0 + (beta * (*v1 - *v0));
-        if a.x > b.x {
-            mem::swap(&mut a, &mut b);
-        }
-        for x in a.x..(b.x + 1) {
-            imgbuf.put_pixel(x as u32, y as u32, pixel);
-        }
-    }
 
-    // top half
-    for y in v1.y..(v2.y + 1) {
-        let segment_height = v2.y - v1.y + 1;
-        let alpha = Scalar { value: (y - v0.y) as f32 / total_height as f32 };
-        let beta  = Scalar { value: (y - v1.y) as f32 / segment_height as f32 };
+    for i in 0..total_height {
+        let second_half = i > v1.y - v0.y || v1.y == v0.y;
+        let segment_height;
+        if second_half {
+            segment_height = v2.y - v1.y + 1;
+        } else {
+            segment_height = v1.y - v0.y + 1;
+        }
+        let alpha = Scalar { value: i as f32 / total_height as f32 };
+        let divisor;
+        if second_half {
+            divisor = v1.y - v0.y;
+        } else {
+            divisor = 0;
+        }
+        let beta  = Scalar { value: (i - divisor) as f32 / segment_height as f32 };
         let mut a: Vertex2<i32> = *v0 + (alpha * (*v2 - *v0));
-        let mut b: Vertex2<i32> = *v1 + (beta * (*v2 - *v1));
+        let mut b: Vertex2<i32>;
+        if second_half {
+            b = *v1 + (beta * (*v2 - *v1));
+        } else {
+            b = *v0 + (beta * (*v1 - *v0));
+        }
         if a.x > b.x {
             mem::swap(&mut a, &mut b);
         }
         for x in a.x..(b.x + 1) {
-            imgbuf.put_pixel(x as u32, y as u32, pixel);
+            imgbuf.put_pixel(x as u32, (v0.y + i) as u32, pixel);
         }
     }
 }
