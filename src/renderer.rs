@@ -4,7 +4,6 @@ use geometry::Vertex2;
 use geometry::Scalar;
 use image::{ImageBuffer, Pixel};
 use std::mem;
-use std::ops::Range;
 
 #[derive(Debug)]
 struct Point {
@@ -29,8 +28,7 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>, vert1: &Vertex2<i32>, 
 
     let total_height = v2.y - v0.y;
     // bottom half of the triangle
-    let y_range  = Range { start: v0.y, end: v1.y + 1 };
-    for y in y_range {
+    for y in v0.y..(v1.y + 1) {
         let segment_height = v1.y - v0.y + 1;
         let alpha = Scalar { value: (y - v0.y) as f32 / total_height as f32 };
         let beta  = Scalar { value: (y - v0.y) as f32 / segment_height as f32 };
@@ -39,15 +37,13 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>, vert1: &Vertex2<i32>, 
         if a.x > b.x {
             mem::swap(&mut a, &mut b);
         }
-        let range = Range { start: a.x, end: b.x + 1 };
-        for x in range {
+        for x in a.x..(b.x + 1) {
             imgbuf.put_pixel(x as u32, y as u32, pixel);
         }
     }
 
     // top half
-    let y_range = Range { start: v1.y, end: v2.y + 1 };
-    for y in y_range {
+    for y in v1.y..(v2.y + 1) {
         let segment_height = v2.y - v1.y + 1;
         let alpha = Scalar { value: (y - v0.y) as f32 / total_height as f32 };
         let beta  = Scalar { value: (y - v1.y) as f32 / segment_height as f32 };
@@ -56,8 +52,7 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>, vert1: &Vertex2<i32>, 
         if a.x > b.x {
             mem::swap(&mut a, &mut b);
         }
-        let range = Range { start: a.x, end: b.x + 1 };
-        for x in range {
+        for x in a.x..(b.x + 1) {
             imgbuf.put_pixel(x as u32, y as u32, pixel);
         }
     }
