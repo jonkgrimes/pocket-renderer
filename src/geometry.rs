@@ -58,6 +58,16 @@ impl Mul<Vertex2<i32>> for Scalar {
     }
 }
 
+impl Vertex3<f32> {
+    fn cross(u: Vertex3<f32>, v: Vertex3<f32>) -> Vertex3<f32> {
+        Vertex3::<f32> {
+            x: u.y * v.z - u.z * v.y,
+            y: u.z * v.x - u.x * v.z,
+            z: u.x * v.y - u.y * v.x
+        }
+    }
+}
+
 impl PartialEq for Vertex2<i32> {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y
