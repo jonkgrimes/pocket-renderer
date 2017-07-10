@@ -1,9 +1,10 @@
 extern crate image;
 
 use geometry::Vertex2;
-use geometry::Scalar;
+use geometry::Vertex3;
 use image::{ImageBuffer, Pixel};
 use std::mem;
+use std::cmp;
 
 #[derive(Debug)]
 struct Point {
@@ -13,11 +14,34 @@ struct Point {
 
 pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>, vert1: &Vertex2<i32>, vert2: &Vertex2<i32>, imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>, pixel: P) {
     let verts = [vert0, vert1, vert2];
-    let bboxmin = Vertex2::<i32> { x: imgbuf.height() as i32 - 1, y: imgbuf.width() as i32 - 1};
-    let bboxmax = Vertex2::<i32> {x :0, y: 0};
-    let clamp = Vertex2::<i32> { x: imgbuf.height() as i32 - 1, y: imgbuf.width() as i32 - 1 };
+    let mut bboxmin = Vertex2::<i32> { x: imgbuf.width() as i32 - 1, y: imgbuf.height() as i32 - 1};
+    let mut bboxmax = Vertex2::<i32> {x :0, y: 0};
+    let clamp = Vertex2::<i32> { x: imgbuf.width() as i32 - 1, y: imgbuf.height() as i32 - 1 };
     for i in 0..3 {
-        bboxmin.x = 0.max(bboxmin.x.min(verts[i].x));
+        bboxmin.x = cmp::max(0,         cmp::min(bboxmin.x, verts[i].x));
+        bboxmax.x = cmp::min(clamp.x,   cmp::max(bboxmax.x, verts[i].x));
+
+        bboxmin.y = cmp::max(0,         cmp::min(bboxmin.y, verts[i].y));
+        bboxmax.y = cmp::min(clamp.y,   cmp::max(bboxmax.y, verts[i].y));
+    }
+
+    let mut p = Vertex2::<i32> { x: bboxmin.x, y: bboxmin.y };
+
+    println!("bboxmin = {:?}", bboxmin);
+    println!("bboxmax = {:?}", bboxmax);
+
+    for x in bboxmin.x..(bboxmax.x+1) {
+        for y in bboxmin.y..(bboxmax.y+1) {
+            p.x = x;
+            p.y = y;
+            let bc_screen = Vertex3::barycentric(*vert0, *vert1, *vert2, p);
+            if bc_screen.x < 0.0 || bc_screen.y < 0.0 || bc_screen.z < 0.0 {
+                println!("Skipping");
+                continue;
+            }
+            println!("p = {:?}", p);
+            imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
+        }
     }
 }
 

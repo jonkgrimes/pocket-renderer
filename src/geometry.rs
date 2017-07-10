@@ -24,20 +24,22 @@ impl<T> Vertex2<T> {
         Vertex2 { x: x, y: y }
     }
 
-    pub fn at(&self, i: i32) -> T {
+    pub fn at(&self, i: i32) -> Option<&T> {
         match i {
-            0 => self.x,
-            1 => self.y
+            0 => Some(&self.x),
+            1 => Some(&self.y),
+            _ => None
         }
     }
 }
 
 impl<T> Vertex3<T> {
-    pub fn at(&self, i: i32) -> T {
+    pub fn at(&self, i: i32) -> Option<&T> {
         match i {
-            0 => self.x,
-            1 => self.y,
-            2 => self.z
+            0 => Some(&self.x),
+            1 => Some(&self.y),
+            2 => Some(&self.z),
+            _ => None
         }
     }
 }
@@ -76,7 +78,7 @@ impl Mul<Vertex2<i32>> for Scalar {
 }
 
 impl Vertex3<f32> {
-    fn cross(u: Vertex3<f32>, v: Vertex3<f32>) -> Vertex3<f32> {
+    pub fn cross(u: Vertex3<f32>, v: Vertex3<f32>) -> Vertex3<f32> {
         Vertex3::<f32> {
             x: u.y * v.z - u.z * v.y,
             y: u.z * v.x - u.x * v.z,
@@ -84,7 +86,7 @@ impl Vertex3<f32> {
         }
     }
 
-    fn barycentric(v0: Vertex2<i32>, v1: Vertex2<i32>, v2: Vertex2<i32>, p: Vertex2<i32>) -> Vertex3<f32> {
+    pub fn barycentric(v0: Vertex2<i32>, v1: Vertex2<i32>, v2: Vertex2<i32>, p: Vertex2<i32>) -> Vertex3<f32> {
         let x: Vertex3<f32> = Vertex3::<f32> { 
             x: v2.x as f32 - v0.x as f32,
             y: v1.x as f32 - v0.x as f32, 
