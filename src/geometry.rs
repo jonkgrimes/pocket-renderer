@@ -23,6 +23,23 @@ impl<T> Vertex2<T> {
     pub fn new(x: i32, y: i32) -> Vertex2<i32> {
         Vertex2 { x: x, y: y }
     }
+
+    pub fn at(&self, i: i32) -> T {
+        match i {
+            0 => self.x,
+            1 => self.y
+        }
+    }
+}
+
+impl<T> Vertex3<T> {
+    pub fn at(&self, i: i32) -> T {
+        match i {
+            0 => self.x,
+            1 => self.y,
+            2 => self.z
+        }
+    }
 }
 
 impl Add for Vertex2<i32> {
@@ -64,6 +81,28 @@ impl Vertex3<f32> {
             x: u.y * v.z - u.z * v.y,
             y: u.z * v.x - u.x * v.z,
             z: u.x * v.y - u.y * v.x
+        }
+    }
+
+    fn barycentric(v0: Vertex2<i32>, v1: Vertex2<i32>, v2: Vertex2<i32>, p: Vertex2<i32>) -> Vertex3<f32> {
+        let x: Vertex3<f32> = Vertex3::<f32> { 
+            x: v2.x as f32 - v0.x as f32,
+            y: v1.x as f32 - v0.x as f32, 
+            z: v0.x as f32 - p.x as f32
+        };
+        let y: Vertex3<f32> = Vertex3::<f32> { 
+            x: v2.y as f32 - v0.y as f32,
+            y: v1.y as f32 - v0.y as f32,
+            z: v0.y as f32 - p.y as f32
+        };
+        let u = Vertex3::cross(x, y);
+        if u.z.abs() < 1.0 {
+            return Vertex3::<f32> { x: -1.0, y: 1.0, z: 1.0 };
+        }
+        Vertex3::<f32> {
+            x: 1.0 - (u.x + u.y)/u.z,
+            y: u.y/u.z,
+            z: u.z/u.z
         }
     }
 }
