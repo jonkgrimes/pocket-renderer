@@ -115,9 +115,24 @@ impl PartialEq for Vertex2<i32> {
     }
 }
 
+impl PartialEq for Vertex3<f32> {
+    fn eq(&self, other: &Self) -> bool {
+        self.x == other.x && self.y == other.y && self.z == other.z
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn cross_product_of_two_3d_vectors() {
+        let a = Vertex3::<f32> { x: 3.0, y: 1.0, z: 0.0 };
+        let b = Vertex3::<f32> { x: 1.0, y: 3.0, z: 1.0 };
+        let actual = Vertex3::cross(a, b);
+        let expected = Vertex3::<f32> { x: 1.0, y: -3.0, z: 8.0  };
+        assert!(actual == expected);
+    }
 
     #[test]
     fn adding_two_2d_vectors() {
