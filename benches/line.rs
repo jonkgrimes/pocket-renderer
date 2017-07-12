@@ -5,7 +5,7 @@ extern crate renderer;
 
 use std::fs::File;
 use std::path::Path;
-use image::{ImageBuffer};
+use image::ImageBuffer;
 use bencher::Bencher;
 
 const RED: [u8; 3] = [255 as u8, 0 as u8, 0 as u8];

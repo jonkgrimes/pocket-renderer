@@ -2,7 +2,7 @@ extern crate image;
 
 use std::fs::File;
 use std::path::Path;
-use image::{ImageBuffer};
+use image::ImageBuffer;
 
 use geometry::Vertex2;
 
@@ -17,9 +17,11 @@ pub mod geometry;
 pub mod renderer;
 
 fn main() {
-    let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1); // +1 hack to get over the out of bounds errors
+    // +1 hack to get over the out of bounds errors
+    let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
 
-    let t0: [Vertex2<i32>; 3] = [Vertex2::<i32>::new(10, 10), Vertex2::<i32>::new(100, 30), Vertex2::<i32>::new(190, 160)];
+    let t0: [Vertex2<i32>; 3] =
+        [Vertex2::<i32>::new(10, 10), Vertex2::<i32>::new(100, 30), Vertex2::<i32>::new(190, 160)];
 
     renderer::triangle(&t0[0], &t0[1], &t0[2], &mut imgbuf, image::Rgb(RED));
 

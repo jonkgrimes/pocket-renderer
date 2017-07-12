@@ -9,13 +9,12 @@ use geometry::Vertex3;
 
 pub struct Model {
     pub verts: Vec<Vertex3<f32>>,
-    pub faces: Vec<Vec<u32>>
+    pub faces: Vec<Vec<u32>>,
 }
 
 impl Model {
-
     pub fn new<P: AsRef<Path>>(path: P) -> Model {
-        let mut verts: Vec<Vertex3<f32>> = Vec::new();;
+        let mut verts: Vec<Vertex3<f32>> = Vec::new();
         let mut faces: Vec<Vec<u32>> = Vec::new();
         let file = File::open(path);
         let buf_reader = BufReader::new(file.unwrap());
@@ -38,8 +37,11 @@ impl Model {
                 faces.push(vert_index_list);
             }
         }
-        Model { verts: verts, faces: faces }
-    } 
+        Model {
+            verts: verts,
+            faces: faces,
+        }
+    }
 
     pub fn verts_len(&self) -> usize {
         self.verts.len()
@@ -65,7 +67,7 @@ mod tests {
     #[test]
     fn parse_face_string_returns_correct_vector() {
         let str = "1/2/3";
-        let expected = vec![0,1,2];
+        let expected = vec![0, 1, 2];
         let actual = parse_face_string(str);
         assert!(actual == expected);
     }
