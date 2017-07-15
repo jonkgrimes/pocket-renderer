@@ -112,7 +112,7 @@ impl Vertex3<f32> {
         Vertex3::<f32> {
             x: 1.0 - (u.x + u.y) / u.z,
             y: u.y / u.z,
-            z: u.z / u.z,
+            z: u.x / u.z,
         }
     }
 }

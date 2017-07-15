@@ -30,7 +30,6 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>,
     for i in 0..3 {
         bboxmin.x = cmp::max(0, cmp::min(bboxmin.x, verts[i].x));
         bboxmax.x = cmp::min(clamp.x, cmp::max(bboxmax.x, verts[i].x));
-
         bboxmin.y = cmp::max(0, cmp::min(bboxmin.y, verts[i].y));
         bboxmax.y = cmp::min(clamp.y, cmp::max(bboxmax.y, verts[i].y));
     }
@@ -40,19 +39,14 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>,
         y: bboxmin.y,
     };
 
-    println!("bboxmin = {:?}", bboxmin);
-    println!("bboxmax = {:?}", bboxmax);
-
     for x in bboxmin.x..(bboxmax.x + 1) {
         for y in bboxmin.y..(bboxmax.y + 1) {
             p.x = x;
             p.y = y;
             let bc_screen = Vertex3::barycentric(*vert0, *vert1, *vert2, p);
             if bc_screen.x < 0.0 || bc_screen.y < 0.0 || bc_screen.z < 0.0 {
-                println!("Skipping");
                 continue;
             }
-            println!("p = {:?}", p);
             imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
         }
     }
