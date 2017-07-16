@@ -5,6 +5,7 @@ use geometry::Vertex3;
 use image::{ImageBuffer, Pixel};
 use std::mem;
 use std::cmp;
+use std::f32;
 
 #[derive(Debug)]
 struct Point {
@@ -12,38 +13,36 @@ struct Point {
     y: i32,
 }
 
-pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>,
-                                    vert1: &Vertex2<i32>,
-                                    vert2: &Vertex2<i32>,
+pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
+                                    vert1: &Vertex3<f32>,
+                                    vert2: &Vertex3<f32>,
                                     zbuffer: &mut [f32],
                                     imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>,
                                     pixel: P) {
     let verts = [vert0, vert1, vert2];
-    let mut bboxmin = Vertex2::<i32> {
-        x: imgbuf.width() as i32 - 1,
-        y: imgbuf.height() as i32 - 1,
-    };
-    let mut bboxmax = Vertex2::<i32> { x: 0, y: 0 };
-    let clamp = Vertex2::<i32> {
-        x: imgbuf.width() as i32 - 1,
-        y: imgbuf.height() as i32 - 1,
+    let mut bboxmin = Vertex2::<f32> { x: f32::INFINITY, y: f32::INFINITY };
+    let mut bboxmax = Vertex2::<f32> { x: f32::NEG_INFINITY, y: f32::NEG_INFINITY };
+    let clamp = Vertex2::<f32> {
+        x: imgbuf.width() as f32 - 1.0,
+        y: imgbuf.height() as f32 - 1.0,
     };
     for i in 0..3 {
-        bboxmin.x = cmp::max(0, cmp::min(bboxmin.x, verts[i].x));
-        bboxmax.x = cmp::min(clamp.x, cmp::max(bboxmax.x, verts[i].x));
-        bboxmin.y = cmp::max(0, cmp::min(bboxmin.y, verts[i].y));
-        bboxmax.y = cmp::min(clamp.y, cmp::max(bboxmax.y, verts[i].y));
+        bboxmin.x = 0f32.max(bboxmin.x.min(verts[i].x));
+        bboxmax.x = clamp.x.min(bboxmax.x.max(verts[i].x));
+        bboxmin.y = 0f32.max(bboxmin.y.min(verts[i].y));
+        bboxmax.y = clamp.y.min(bboxmax.y.max(verts[i].y));
     }
 
-    let mut p = Vertex2::<i32> {
-        x: bboxmin.x,
-        y: bboxmin.y,
+    let mut p = Vertex3::<f32> {
+        x: bboxmin.x as f32,
+        y: bboxmin.y as f32,
+        z: 0.0
     };
 
-    for x in bboxmin.x..(bboxmax.x + 1) {
-        for y in bboxmin.y..(bboxmax.y + 1) {
-            p.x = x;
-            p.y = y;
+    for x in (bboxmin.x as u32)..(bboxmax.x as u32 + 1) {
+        for y in (bboxmin.y as u32)..(bboxmax.y as u32 + 1) {
+            p.x = x as f32;
+            p.y = y as f32;
             let bc_screen = Vertex3::barycentric(*vert0, *vert1, *vert2, p);
             if bc_screen.x < 0.0 || bc_screen.y < 0.0 || bc_screen.z < 0.0 {
                 continue;

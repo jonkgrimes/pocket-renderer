@@ -2,30 +2,33 @@ extern crate image;
 
 use std::fs::File;
 use std::path::Path;
+use std::f32;
 use image::ImageBuffer;
 use model::Model;
 use geometry::Vertex2;
 use geometry::Vertex3;
 
-const WIDTH: u32 = 800;
-const HEIGHT: u32 = 800;
-
 pub mod model;
 pub mod geometry;
 pub mod renderer;
+
+const WIDTH: u32 = 800;
+const HEIGHT: u32 = 800;
+const ZBUFFER_SIZE: usize = WIDTH as usize + 1 * HEIGHT as usize + 1;
 
 fn main() {
     // +1 hack to get over the out of bounds errors
     let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
     let model = Model::new("models/african_head.obj");
     let light_dir = Vertex3::<f32> { x: 0.0, y: 0.0, z: -1.0 };
-    let mut zbuffer: [f32; WIDTH as usize + 1 * HEIGHT as usize + 1];
+
+    let mut zbuffer: [f32; ZBUFFER_SIZE] = [f32::NEG_INFINITY; ZBUFFER_SIZE];
 
     for face in model.faces {
-        let mut screen_coords: [Vertex2<i32>; 3] = [
-            Vertex2::<i32> {x: 0, y: 0},
-            Vertex2::<i32> {x: 0, y: 0},
-            Vertex2::<i32> {x: 0, y: 0},
+        let mut screen_coords: [Vertex3<f32>; 3] = [
+            Vertex3::<f32> {x: 0.0, y: 0.0, z:0.0},
+            Vertex3::<f32> {x: 0.0, y: 0.0, z:0.0},
+            Vertex3::<f32> {x: 0.0, y: 0.0, z:0.0},
         ];
         let mut world_coords: [Vertex3<f32>; 3] = [
             Vertex3::<f32> {x: 0f32, y: 0f32, z: 0f32},
@@ -35,9 +38,10 @@ fn main() {
         for i in 0..3 {
             let vertex_index = *face.get(i).unwrap() as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
-            screen_coords[i] = Vertex2::<i32> {
-                x: ((world_coords[i].x + 1.0) * WIDTH as f32 / 2.0) as i32,
-                y: ((world_coords[i].y + 1.0) * HEIGHT as f32 / 2.0) as i32
+            screen_coords[i] = Vertex3::<f32> {
+                x: ((world_coords[i].x + 1.0) * WIDTH as f32 / 2.0),
+                y: ((world_coords[i].y + 1.0) * HEIGHT as f32 / 2.0),
+                z: world_coords[i].z,
             } ;
         }
         let mut n = Vertex3::cross((world_coords[2] - world_coords[0]), (world_coords[1] - world_coords[0]));
