@@ -43,10 +43,8 @@ fn main() {
         n = n.normalize();
         let intensity = n * light_dir;
         if intensity > 0.0 {
-            println!("{}", intensity);
             let color_value = (255.0 * intensity) as u8;
             let pixel = image::Rgba([color_value, color_value, color_value, 255u8]);
-            println!("{:?}", pixel);
             renderer::triangle(&screen_coords[0], &screen_coords[1], &screen_coords[2], &mut imgbuf, pixel);
         }
     }
