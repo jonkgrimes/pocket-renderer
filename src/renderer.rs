@@ -15,6 +15,7 @@ struct Point {
 pub fn triangle<P: Pixel + 'static>(vert0: &Vertex2<i32>,
                                     vert1: &Vertex2<i32>,
                                     vert2: &Vertex2<i32>,
+                                    zbuffer: &mut [f32],
                                     imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>,
                                     pixel: P) {
     let verts = [vert0, vert1, vert2];

@@ -19,6 +19,7 @@ fn main() {
     let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
     let model = Model::new("models/african_head.obj");
     let light_dir = Vertex3::<f32> { x: 0.0, y: 0.0, z: -1.0 };
+    let mut zbuffer: [f32; WIDTH as usize + 1 * HEIGHT as usize + 1];
 
     for face in model.faces {
         let mut screen_coords: [Vertex2<i32>; 3] = [
@@ -45,7 +46,7 @@ fn main() {
         if intensity > 0.0 {
             let color_value = (255.0 * intensity) as u8;
             let pixel = image::Rgba([color_value, color_value, color_value, 255u8]);
-            renderer::triangle(&screen_coords[0], &screen_coords[1], &screen_coords[2], &mut imgbuf, pixel);
+            renderer::triangle(&screen_coords[0], &screen_coords[1], &screen_coords[2], &mut zbuffer, &mut imgbuf, pixel);
         }
     }
 
