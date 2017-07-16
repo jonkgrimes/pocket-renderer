@@ -1,6 +1,7 @@
 use std::ops::Add;
 use std::ops::Mul;
 use std::ops::Sub;
+use std::f32;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vertex3<T> {
@@ -77,7 +78,36 @@ impl Mul<Vertex2<i32>> for Scalar {
     }
 }
 
+impl Mul<Vertex3<f32>> for Scalar {
+    type Output = Vertex3<f32>;
+    
+    fn mul(self, rhs: Vertex3<f32>) -> Vertex3<f32> {
+        Vertex3::<f32> {
+            x: self.value * rhs.x,
+            y: self.value * rhs.y,
+            z: self.value * rhs.z
+        }
+    }
+}
+
+impl Mul<Vertex3<f32>> for Vertex3<f32> {
+    type Output = f32;
+
+    fn mul(self, rhs: Vertex3<f32>) -> f32 {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
+}
+
 impl Vertex3<f32> {
+
+    pub fn norm(&self) -> f32 {
+        (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
+    }
+
+    pub fn normalize(&self) -> Vertex3<f32> {
+        Scalar { value: 1.0 / self.norm() } * *self
+    }
+
     pub fn cross(u: Vertex3<f32>, v: Vertex3<f32>) -> Vertex3<f32> {
         Vertex3::<f32> {
             x: u.y * v.z - u.z * v.y,
@@ -113,6 +143,18 @@ impl Vertex3<f32> {
             x: 1.0 - (u.x + u.y) / u.z,
             y: u.y / u.z,
             z: u.x / u.z,
+        }
+    }
+}
+
+impl Sub for Vertex3<f32> {
+    type Output = Vertex3<f32>;
+
+    fn sub(self, rhs: Vertex3<f32>) -> Vertex3<f32> {
+        Vertex3::<f32> {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z
         }
     }
 }
