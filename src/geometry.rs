@@ -131,11 +131,6 @@ impl Vertex3<f32> {
             y: v1.y as f32 - v0.y as f32,
             z: v0.y as f32 - p.y as f32,
         };
-        let z: Vertex3<f32> = Vertex3::<f32> {
-            x: v2.z as f32 - v0.z as f32,
-            y: v1.z as f32 - v0.z as f32,
-            z: v0.z as f32 - p.z as f32,
-        };
         let u = Vertex3::cross(x, y);
         if u.z.abs() < 1.0 {
             return Vertex3::<f32> {

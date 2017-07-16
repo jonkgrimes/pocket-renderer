@@ -4,7 +4,6 @@ use geometry::Vertex2;
 use geometry::Vertex3;
 use image::{ImageBuffer, Pixel};
 use std::mem;
-use std::cmp;
 use std::f32;
 
 #[derive(Debug)]
@@ -23,8 +22,8 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
     let mut bboxmin = Vertex2::<f32> { x: f32::INFINITY, y: f32::INFINITY };
     let mut bboxmax = Vertex2::<f32> { x: f32::NEG_INFINITY, y: f32::NEG_INFINITY };
     let clamp = Vertex2::<f32> {
-        x: imgbuf.width() as f32 - 1.0,
-        y: imgbuf.height() as f32 - 1.0,
+        x: (imgbuf.width() - 1) as f32,
+        y: (imgbuf.height() - 1) as f32,
     };
     for i in 0..3 {
         bboxmin.x = 0f32.max(bboxmin.x.min(verts[i].x));
@@ -47,7 +46,18 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
             if bc_screen.x < 0.0 || bc_screen.y < 0.0 || bc_screen.z < 0.0 {
                 continue;
             }
-            imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
+            println!("v0 = {:?}, v1 = {:?}, v2 = {:?}", vert0, vert1, vert2);
+            println!("p = {:?}", p);
+            p.z = 0.0;
+            p.z += vert0.z * bc_screen.x;
+            p.z += vert1.z * bc_screen.y;
+            p.z += vert2.z * bc_screen.z;
+            println!("p = {:?}", p);
+            let zbuff_idx = ((p.x + p.y) * (imgbuf.width() - 1) as f32) as usize;
+            if zbuffer[zbuff_idx - 1] < p.z {
+                zbuffer[zbuff_idx - 1] = p.z;
+                imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
+            }
         }
     }
 }

@@ -5,7 +5,6 @@ use std::path::Path;
 use std::f32;
 use image::ImageBuffer;
 use model::Model;
-use geometry::Vertex2;
 use geometry::Vertex3;
 
 pub mod model;
@@ -14,7 +13,7 @@ pub mod renderer;
 
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 800;
-const ZBUFFER_SIZE: usize = WIDTH as usize + 1 * HEIGHT as usize + 1;
+const ZBUFFER_SIZE: usize = (WIDTH * HEIGHT) as usize;
 
 fn main() {
     // +1 hack to get over the out of bounds errors
@@ -39,8 +38,8 @@ fn main() {
             let vertex_index = *face.get(i).unwrap() as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
             screen_coords[i] = Vertex3::<f32> {
-                x: ((world_coords[i].x + 1.0) * WIDTH as f32 / 2.0),
-                y: ((world_coords[i].y + 1.0) * HEIGHT as f32 / 2.0),
+                x: ((world_coords[i].x + 1.0) * WIDTH as f32 / 2.0) + 0.5,
+                y: ((world_coords[i].y + 1.0) * HEIGHT as f32 / 2.0) + 0.5,
                 z: world_coords[i].z,
             } ;
         }
