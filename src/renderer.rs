@@ -19,8 +19,14 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
                                     imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>,
                                     pixel: P) {
     let verts = [vert0, vert1, vert2];
-    let mut bboxmin = Vertex2::<f32> { x: f32::INFINITY, y: f32::INFINITY };
-    let mut bboxmax = Vertex2::<f32> { x: f32::NEG_INFINITY, y: f32::NEG_INFINITY };
+    let mut bboxmin = Vertex2::<f32> {
+        x: f32::INFINITY,
+        y: f32::INFINITY,
+    };
+    let mut bboxmax = Vertex2::<f32> {
+        x: f32::NEG_INFINITY,
+        y: f32::NEG_INFINITY,
+    };
     let clamp = Vertex2::<f32> {
         x: (imgbuf.width() - 1) as f32,
         y: (imgbuf.height() - 1) as f32,
@@ -35,7 +41,7 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
     let mut p = Vertex3::<f32> {
         x: bboxmin.x as f32,
         y: bboxmin.y as f32,
-        z: 0.0
+        z: 0.0,
     };
 
     for x in (bboxmin.x as u32)..(bboxmax.x as u32 + 1) {

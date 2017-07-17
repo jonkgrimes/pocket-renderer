@@ -80,12 +80,12 @@ impl Mul<Vertex2<i32>> for Scalar {
 
 impl Mul<Vertex3<f32>> for Scalar {
     type Output = Vertex3<f32>;
-    
+
     fn mul(self, rhs: Vertex3<f32>) -> Vertex3<f32> {
         Vertex3::<f32> {
             x: self.value * rhs.x,
             y: self.value * rhs.y,
-            z: self.value * rhs.z
+            z: self.value * rhs.z,
         }
     }
 }
@@ -99,7 +99,6 @@ impl Mul<Vertex3<f32>> for Vertex3<f32> {
 }
 
 impl Vertex3<f32> {
-
     pub fn norm(&self) -> f32 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
@@ -154,7 +153,7 @@ impl Sub for Vertex3<f32> {
         Vertex3::<f32> {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
-            z: self.z - rhs.z
+            z: self.z - rhs.z,
         }
     }
 }
