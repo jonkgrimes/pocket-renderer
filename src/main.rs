@@ -13,7 +13,7 @@ pub mod renderer;
 
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 800;
-const ZBUFFER_SIZE: usize = (WIDTH * HEIGHT) as usize;
+const ZBUFFER_SIZE: usize = ((WIDTH + 1) * (HEIGHT + 1)) as usize;
 
 fn main() {
     // +1 hack to get over the out of bounds errors
@@ -32,32 +32,12 @@ fn main() {
                                                         x: 0.0,
                                                         y: 0.0,
                                                         z: 0.0,
-                                                    },
-                                                    Vertex3::<f32> {
-                                                        x: 0.0,
-                                                        y: 0.0,
-                                                        z: 0.0,
-                                                    },
-                                                    Vertex3::<f32> {
-                                                        x: 0.0,
-                                                        y: 0.0,
-                                                        z: 0.0,
-                                                    }];
+                                                    }; 3];
         let mut world_coords: [Vertex3<f32>; 3] = [Vertex3::<f32> {
-                                                       x: 0f32,
-                                                       y: 0f32,
-                                                       z: 0f32,
-                                                   },
-                                                   Vertex3::<f32> {
-                                                       x: 0f32,
-                                                       y: 0f32,
-                                                       z: 0f32,
-                                                   },
-                                                   Vertex3::<f32> {
-                                                       x: 0f32,
-                                                       y: 0f32,
-                                                       z: 0f32,
-                                                   }];
+                                                       x: 0.0,
+                                                       y: 0.0,
+                                                       z: 0.0,
+                                                   }; 3];
         for i in 0..3 {
             let vertex_index = *face.get(i).unwrap() as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();

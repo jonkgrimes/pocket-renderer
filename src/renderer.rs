@@ -19,6 +19,8 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
                                     imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>,
                                     pixel: P) {
     let verts = [vert0, vert1, vert2];
+    let height = (imgbuf.height() - 1) as f32;
+    let width = (imgbuf.width() - 1) as f32;
     let mut bboxmin = Vertex2::<f32> {
         x: f32::INFINITY,
         y: f32::INFINITY,
@@ -28,8 +30,8 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
         y: f32::NEG_INFINITY,
     };
     let clamp = Vertex2::<f32> {
-        x: (imgbuf.width() - 1) as f32,
-        y: (imgbuf.height() - 1) as f32,
+        x: width,
+        y: height,
     };
     for i in 0..3 {
         bboxmin.x = 0f32.max(bboxmin.x.min(verts[i].x));
@@ -52,14 +54,11 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
             if bc_screen.x < 0.0 || bc_screen.y < 0.0 || bc_screen.z < 0.0 {
                 continue;
             }
-            println!("v0 = {:?}, v1 = {:?}, v2 = {:?}", vert0, vert1, vert2);
-            println!("p = {:?}", p);
             p.z = 0.0;
             p.z += vert0.z * bc_screen.x;
             p.z += vert1.z * bc_screen.y;
             p.z += vert2.z * bc_screen.z;
-            println!("p = {:?}", p);
-            let zbuff_idx = ((p.x + p.y) * (imgbuf.width() - 1) as f32) as usize;
+            let zbuff_idx = (p.x + p.y * width) as usize;
             if zbuffer[zbuff_idx - 1] < p.z {
                 zbuffer[zbuff_idx - 1] = p.z;
                 imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
