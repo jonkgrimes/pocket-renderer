@@ -15,6 +15,7 @@ struct Point {
 pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
                                     vert1: &Vertex3<f32>,
                                     vert2: &Vertex3<f32>,
+                                    uv: &Vertex2<f32>,
                                     zbuffer: &mut [f32],
                                     imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>,
                                     pixel: P) {

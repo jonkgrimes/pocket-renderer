@@ -5,16 +5,19 @@ use std::io::prelude::*;
 use std::vec::Vec;
 use std::f32;
 
+use geometry::Vertex2;
 use geometry::Vertex3;
 
 pub struct Model {
     pub verts: Vec<Vertex3<f32>>,
+    pub textures: Vec<Vertex2<f32>>,
     pub faces: Vec<Vec<u32>>,
 }
 
 impl Model {
     pub fn new<P: AsRef<Path>>(path: P) -> Model {
         let mut verts: Vec<Vertex3<f32>> = Vec::new();
+        let mut textures: Vec<Vertex2<f32>> = Vec::new();
         let mut faces: Vec<Vec<u32>> = Vec::new();
         let file = File::open(path);
         let buf_reader = BufReader::new(file.unwrap());
@@ -29,6 +32,12 @@ impl Model {
                 verts.push(Vertex3 { x: x, y: y, z: z });
             }
 
+            if values[0] == "vt" {
+                let x: f32 = values[2].parse().unwrap();
+                let y: f32 = values[3].parse().unwrap();
+                textures.push(Vertex2 { x: x, y: y });
+            }
+
             if values[0] == "f" {
                 let mut vert_index_list: Vec<u32> = Vec::new();
                 vert_index_list.push(*parse_face_string(values[1]).get(0).unwrap());
@@ -40,6 +49,7 @@ impl Model {
         Model {
             verts: verts,
             faces: faces,
+            textures: textures,
         }
     }
 
