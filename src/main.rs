@@ -44,11 +44,7 @@ fn main() {
             let texture_index = face.get_texture(i) as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
             texture_coords[i] = *model.textures.get(texture_index).unwrap();
-            screen_coords[i] = Vertex3::<f32> {
-                x: ((world_coords[i].x + 1.0) * WIDTH as f32 / 2.0) + 0.5,
-                y: ((world_coords[i].y + 1.0) * HEIGHT as f32 / 2.0) + 0.5,
-                z: world_coords[i].z,
-            };
+            screen_coords[i] = world_coords[i].to_screen(HEIGHT, WIDTH);
         }
         let mut n = Vertex3::cross((world_coords[2] - world_coords[0]),
                                    (world_coords[1] - world_coords[0]));

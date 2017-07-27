@@ -45,6 +45,16 @@ impl<T> Vertex3<T> {
     }
 }
 
+impl Vertex3<f32> {
+    pub fn to_screen(&self, height: u32, width: u32) -> Vertex3<f32> {
+        Vertex3::<f32> {
+            x: ((self.x + 1.0) * width as f32 / 2.0) + 0.5,
+            y: ((self.y + 1.0) * height as f32 / 2.0) + 0.5,
+            z: self.z,
+        }
+    }
+}
+
 impl Add for Vertex2<i32> {
     type Output = Vertex2<i32>;
 
