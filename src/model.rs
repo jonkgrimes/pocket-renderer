@@ -47,6 +47,7 @@ impl Model {
             let decoded_line = line.unwrap();
             let values: Vec<&str> = decoded_line.split(" ").collect();
 
+            // parse out all the vertices
             if values[0] == "v" {
                 let x: f32 = values[1].parse().unwrap();
                 let y: f32 = values[2].parse().unwrap();
@@ -54,12 +55,15 @@ impl Model {
                 verts.push(Vertex3 { x: x, y: y, z: z });
             }
 
+            // get the texture coordinates
             if values[0] == "vt" {
                 let x: f32 = values[2].parse().unwrap();
                 let y: f32 = values[3].parse().unwrap();
                 textures.push(Vertex2 { x: x, y: y });
             }
 
+            // parse out the faces which are of the following format
+            // f vertex0_idx/texture_idx/normal_idx vertex1_idx/...
             if values[0] == "f" {
                 let mut face = Face { vertexes: [0; 3], textures: [0; 3] };
                 for i in 0..3 {
