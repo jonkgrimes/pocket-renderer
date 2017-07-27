@@ -5,7 +5,7 @@ use std::path::Path;
 use std::f32;
 use image::ImageBuffer;
 use model::Model;
-use geometry::Vertex3;
+use geometry::{Vertex2, Vertex3};
 
 pub mod model;
 pub mod geometry;
@@ -38,8 +38,13 @@ fn main() {
             y: 0.0,
             z: 0.0,
         }; 3];
+        let mut texture_coords: [Vertex2<f32>; 3] = [Vertex2::<f32> {
+            x: 0.0,
+            y: 0.0
+        }; 3];
         for i in 0..3 {
-            let vertex_index = *face.get(i).unwrap() as usize;
+            println!("{:?}", face);
+            let vertex_index = face.get_vertex(i) as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
             screen_coords[i] = Vertex3::<f32> {
                 x: ((world_coords[i].x + 1.0) * WIDTH as f32 / 2.0) + 0.5,

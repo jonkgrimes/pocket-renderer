@@ -14,15 +14,27 @@ use geometry::Vertex3;
 pub struct Model {
     pub verts: Vec<Vertex3<f32>>,
     pub textures: Vec<Vertex2<f32>>,
-    pub faces: Vec<Vec<u32>>,
+    pub faces: Vec<Face>,
     pub texture_image: DynamicImage,
+}
+
+#[derive(Debug)]
+pub struct Face {
+    pub vertexes: [u32; 3],
+    pub textures: [u32; 3],
+}
+
+impl Face {
+    pub fn get_vertex(&self, i: usize) -> u32 {
+        self.vertexes[i]
+    }
 }
 
 impl Model {
     pub fn new(path: &str) -> Model {
         let mut verts: Vec<Vertex3<f32>> = Vec::new();
         let mut textures: Vec<Vertex2<f32>> = Vec::new();
-        let mut faces: Vec<Vec<u32>> = Vec::new();
+        let mut faces: Vec<Face> = Vec::new();
         let file = File::open(Path::new(&format!("models/{}.obj", path)));
         let buf_reader = BufReader::new(file.unwrap());
         let texture_image = image::open(Path::new(&format!("models/{}_diffuse.png", path)))
@@ -46,10 +58,14 @@ impl Model {
 
             if values[0] == "f" {
                 let mut vert_index_list: Vec<u32> = Vec::new();
-                vert_index_list.push(*parse_face_string(values[1]).get(0).unwrap());
-                vert_index_list.push(*parse_face_string(values[2]).get(0).unwrap());
-                vert_index_list.push(*parse_face_string(values[3]).get(0).unwrap());
-                faces.push(vert_index_list);
+                let mut face = Face { vertexes: [0; 3], textures: [0; 3] };
+                face.vertexes[0] = *parse_face_string(values[1]).get(0).unwrap();
+                face.textures[0] = *parse_face_string(values[1]).get(1).unwrap();
+                face.vertexes[1] = *parse_face_string(values[2]).get(0).unwrap();
+                face.textures[1] = *parse_face_string(values[2]).get(1).unwrap();
+                face.vertexes[2] = *parse_face_string(values[3]).get(0).unwrap();
+                face.textures[2] = *parse_face_string(values[3]).get(1).unwrap();
+                faces.push(face);
             }
         }
         Model {

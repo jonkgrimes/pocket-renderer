@@ -144,6 +144,7 @@ impl Vertex3<f32> {
             z: u.x / u.z,
         }
     }
+
 }
 
 impl Sub for Vertex3<f32> {
