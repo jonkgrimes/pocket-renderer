@@ -18,7 +18,7 @@ const ZBUFFER_SIZE: usize = ((WIDTH + 1) * (HEIGHT + 1)) as usize;
 fn main() {
     // +1 hack to get over the out of bounds errors
     let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
-    let model = Model::new("models/african_head.obj");
+    let model = Model::new("african_head");
     let light_dir = Vertex3::<f32> {
         x: 0.0,
         y: 0.0,

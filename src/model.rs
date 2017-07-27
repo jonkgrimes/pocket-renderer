@@ -1,9 +1,12 @@
+extern crate image;
+
 use std::path::Path;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
 use std::vec::Vec;
 use std::f32;
+use image::DynamicImage;
 
 use geometry::Vertex2;
 use geometry::Vertex3;
@@ -12,15 +15,17 @@ pub struct Model {
     pub verts: Vec<Vertex3<f32>>,
     pub textures: Vec<Vertex2<f32>>,
     pub faces: Vec<Vec<u32>>,
+    pub texture_image: DynamicImage,
 }
 
 impl Model {
-    pub fn new<P: AsRef<Path>>(path: P) -> Model {
+    pub fn new(path: &str) -> Model {
         let mut verts: Vec<Vertex3<f32>> = Vec::new();
         let mut textures: Vec<Vertex2<f32>> = Vec::new();
         let mut faces: Vec<Vec<u32>> = Vec::new();
-        let file = File::open(path);
+        let file = File::open(Path::new(&format!("models/{}.obj", path)));
         let buf_reader = BufReader::new(file.unwrap());
+        let texture_image = image::open(Path::new(&format!("models/{}_diffuse.png", path))).unwrap();
         for line in buf_reader.lines() {
             let decoded_line = line.unwrap();
             let values: Vec<&str> = decoded_line.split(" ").collect();
@@ -50,6 +55,7 @@ impl Model {
             verts: verts,
             faces: faces,
             textures: textures,
+            texture_image: texture_image,
         }
     }
 
