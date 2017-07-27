@@ -28,6 +28,10 @@ impl Face {
     pub fn get_vertex(&self, i: usize) -> u32 {
         self.vertexes[i]
     }
+
+    pub fn get_texture(&self, i: usize) -> u32 {
+        self.textures[i]
+    }
 }
 
 impl Model {
@@ -57,14 +61,11 @@ impl Model {
             }
 
             if values[0] == "f" {
-                let mut vert_index_list: Vec<u32> = Vec::new();
                 let mut face = Face { vertexes: [0; 3], textures: [0; 3] };
-                face.vertexes[0] = *parse_face_string(values[1]).get(0).unwrap();
-                face.textures[0] = *parse_face_string(values[1]).get(1).unwrap();
-                face.vertexes[1] = *parse_face_string(values[2]).get(0).unwrap();
-                face.textures[1] = *parse_face_string(values[2]).get(1).unwrap();
-                face.vertexes[2] = *parse_face_string(values[3]).get(0).unwrap();
-                face.textures[2] = *parse_face_string(values[3]).get(1).unwrap();
+                for i in 0..3 {
+                    face.vertexes[i] = *parse_face_string(values[i+1]).get(0).unwrap();
+                    face.textures[i] = *parse_face_string(values[i+1]).get(1).unwrap();
+                }
                 faces.push(face);
             }
         }

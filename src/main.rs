@@ -43,9 +43,10 @@ fn main() {
             y: 0.0
         }; 3];
         for i in 0..3 {
-            println!("{:?}", face);
             let vertex_index = face.get_vertex(i) as usize;
+            let texture_index = face.get_texture(i) as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
+            texture_coords[i] = *model.textures.get(texture_index).unwrap();
             screen_coords[i] = Vertex3::<f32> {
                 x: ((world_coords[i].x + 1.0) * WIDTH as f32 / 2.0) + 0.5,
                 y: ((world_coords[i].y + 1.0) * HEIGHT as f32 / 2.0) + 0.5,
@@ -59,9 +60,8 @@ fn main() {
         if intensity > 0.0 {
             let color_value = (255.0 * intensity) as u8;
             let pixel = image::Rgba([color_value, color_value, color_value, 255u8]);
-            renderer::triangle(&screen_coords[0],
-                               &screen_coords[1],
-                               &screen_coords[2],
+            renderer::triangle(&screen_coords,
+                               &texture_coords,
                                &mut zbuffer,
                                &mut imgbuf,
                                pixel);

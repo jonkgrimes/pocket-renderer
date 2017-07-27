@@ -12,13 +12,11 @@ struct Point {
     y: i32,
 }
 
-pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
-                                    vert1: &Vertex3<f32>,
-                                    vert2: &Vertex3<f32>,
+pub fn triangle<P: Pixel + 'static>(verts: &[Vertex3<f32>; 3],
+                                    textures: &[Vertex2<f32>; 3],
                                     zbuffer: &mut [f32],
                                     imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>,
                                     pixel: P) {
-    let verts = [vert0, vert1, vert2];
     let height = (imgbuf.height() - 1) as f32;
     let width = (imgbuf.width() - 1) as f32;
     let mut bboxmin = Vertex2::<f32> {
@@ -50,14 +48,14 @@ pub fn triangle<P: Pixel + 'static>(vert0: &Vertex3<f32>,
         for y in (bboxmin.y as u32)..(bboxmax.y as u32 + 1) {
             p.x = x as f32;
             p.y = y as f32;
-            let bc_screen = Vertex3::barycentric(*vert0, *vert1, *vert2, p);
+            let bc_screen = Vertex3::barycentric(verts[0], verts[1], verts[2], p);
             if bc_screen.x < 0.0 || bc_screen.y < 0.0 || bc_screen.z < 0.0 {
                 continue;
             }
             p.z = 0.0;
-            p.z += vert0.z * bc_screen.x;
-            p.z += vert1.z * bc_screen.y;
-            p.z += vert2.z * bc_screen.z;
+            p.z += verts[0].z * bc_screen.x;
+            p.z += verts[1].z * bc_screen.y;
+            p.z += verts[2].z * bc_screen.z;
             let zbuff_idx = (p.x + p.y * width) as usize;
             if zbuffer[zbuff_idx - 1] < p.z {
                 zbuffer[zbuff_idx - 1] = p.z;
