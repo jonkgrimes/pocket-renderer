@@ -29,15 +29,15 @@ fn main() {
 
     for face in model.faces {
         let mut screen_coords: [Vertex3<f32>; 3] = [Vertex3::<f32> {
-                                                        x: 0.0,
-                                                        y: 0.0,
-                                                        z: 0.0,
-                                                    }; 3];
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }; 3];
         let mut world_coords: [Vertex3<f32>; 3] = [Vertex3::<f32> {
-                                                       x: 0.0,
-                                                       y: 0.0,
-                                                       z: 0.0,
-                                                   }; 3];
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }; 3];
         for i in 0..3 {
             let vertex_index = *face.get(i).unwrap() as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();

@@ -25,7 +25,8 @@ impl Model {
         let mut faces: Vec<Vec<u32>> = Vec::new();
         let file = File::open(Path::new(&format!("models/{}.obj", path)));
         let buf_reader = BufReader::new(file.unwrap());
-        let texture_image = image::open(Path::new(&format!("models/{}_diffuse.png", path))).unwrap();
+        let texture_image = image::open(Path::new(&format!("models/{}_diffuse.png", path)))
+            .unwrap();
         for line in buf_reader.lines() {
             let decoded_line = line.unwrap();
             let values: Vec<&str> = decoded_line.split(" ").collect();
