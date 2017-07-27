@@ -65,10 +65,13 @@ impl Model {
             // parse out the faces which are of the following format
             // f vertex0_idx/texture_idx/normal_idx vertex1_idx/...
             if values[0] == "f" {
-                let mut face = Face { vertexes: [0; 3], textures: [0; 3] };
+                let mut face = Face {
+                    vertexes: [0; 3],
+                    textures: [0; 3],
+                };
                 for i in 0..3 {
-                    face.vertexes[i] = *parse_face_string(values[i+1]).get(0).unwrap();
-                    face.textures[i] = *parse_face_string(values[i+1]).get(1).unwrap();
+                    face.vertexes[i] = *parse_face_string(values[i + 1]).get(0).unwrap();
+                    face.textures[i] = *parse_face_string(values[i + 1]).get(1).unwrap();
                 }
                 faces.push(face);
             }

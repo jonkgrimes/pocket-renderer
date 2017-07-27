@@ -2,7 +2,7 @@ extern crate image;
 
 use geometry::Vertex2;
 use geometry::Vertex3;
-use image::{ImageBuffer, Pixel};
+use image::{ImageBuffer, RgbaImage, Pixel};
 use std::mem;
 use std::f32;
 
@@ -12,11 +12,11 @@ struct Point {
     y: i32,
 }
 
-pub fn triangle<P: Pixel + 'static>(verts: &[Vertex3<f32>; 3],
-                                    textures: &[Vertex2<f32>; 3],
-                                    zbuffer: &mut [f32],
-                                    imgbuf: &mut ImageBuffer<P, Vec<P::Subpixel>>,
-                                    pixel: P) {
+pub fn triangle(verts: &[Vertex3<f32>; 3],
+                textures: &[Vertex2<f32>; 3],
+                zbuffer: &mut [f32],
+                intensity: f32,
+                imgbuf: &mut RgbaImage) {
     let height = (imgbuf.height() - 1) as f32;
     let width = (imgbuf.width() - 1) as f32;
     let mut bboxmin = Vertex2::<f32> {
@@ -59,6 +59,8 @@ pub fn triangle<P: Pixel + 'static>(verts: &[Vertex3<f32>; 3],
             let zbuff_idx = (p.x + p.y * width) as usize;
             if zbuffer[zbuff_idx - 1] < p.z {
                 zbuffer[zbuff_idx - 1] = p.z;
+                let color_value = (255.0 * intensity) as u8;
+                let pixel = image::Rgba([color_value, color_value, color_value, 255u8]);
                 imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
             }
         }

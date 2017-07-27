@@ -38,10 +38,7 @@ fn main() {
             y: 0.0,
             z: 0.0,
         }; 3];
-        let mut texture_coords: [Vertex2<f32>; 3] = [Vertex2::<f32> {
-            x: 0.0,
-            y: 0.0
-        }; 3];
+        let mut texture_coords: [Vertex2<f32>; 3] = [Vertex2::<f32> { x: 0.0, y: 0.0 }; 3];
         for i in 0..3 {
             let vertex_index = face.get_vertex(i) as usize;
             let texture_index = face.get_texture(i) as usize;
@@ -58,13 +55,11 @@ fn main() {
         n = n.normalize();
         let intensity = n * light_dir;
         if intensity > 0.0 {
-            let color_value = (255.0 * intensity) as u8;
-            let pixel = image::Rgba([color_value, color_value, color_value, 255u8]);
             renderer::triangle(&screen_coords,
                                &texture_coords,
                                &mut zbuffer,
-                               &mut imgbuf,
-                               pixel);
+                               intensity,
+                               &mut imgbuf)
         }
     }
 
