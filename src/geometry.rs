@@ -66,6 +66,17 @@ impl Add for Vertex2<i32> {
     }
 }
 
+impl Add for Vertex2<f32> {
+    type Output = Vertex2<f32>;
+
+    fn add(self, other: Vertex2<f32>) -> Vertex2<f32> {
+        Vertex2::<f32> {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
 impl Sub for Vertex2<i32> {
     type Output = Vertex2<i32>;
 
@@ -131,16 +142,48 @@ impl Vertex3<f32> {
                        p: Vertex3<f32>)
                        -> Vertex3<f32> {
         let x: Vertex3<f32> = Vertex3::<f32> {
-            x: v2.x as f32 - v0.x as f32,
-            y: v1.x as f32 - v0.x as f32,
-            z: v0.x as f32 - p.x as f32,
+            x: v2.x - v0.x,
+            y: v1.x - v0.x,
+            z: v0.x - p.x,
         };
         let y: Vertex3<f32> = Vertex3::<f32> {
-            x: v2.y as f32 - v0.y as f32,
-            y: v1.y as f32 - v0.y as f32,
-            z: v0.y as f32 - p.y as f32,
+            x: v2.y - v0.y,
+            y: v1.y - v0.y,
+            z: v0.y - p.y,
         };
         let u = Vertex3::cross(x, y);
+        if u.z.abs() < 1.0 {
+            return Vertex3::<f32> {
+                x: -1.0,
+                y: 1.0,
+                z: 1.0,
+            };
+        }
+        Vertex3::<f32> {
+            x: 1.0 - (u.x + u.y) / u.z,
+            y: u.y / u.z,
+            z: u.x / u.z,
+        }
+    }
+}
+
+impl Vertex2<f32> {
+    pub fn barycentric(v0: Vertex2<f32>,
+                       v1: Vertex2<f32>,
+                       v2: Vertex2<f32>,
+                       p:  Vertex2<f32>) 
+                       -> Vertex3<f32> {
+        let a = Vertex3::<f32> { 
+            x: v2.x - v0.x,
+            y: v1.x - v0.x,
+            z: v0.x - p.x
+        };
+        let b = Vertex3::<f32> {
+            x: v2.y - v0.y,
+            y: v1.y - v0.y,
+            z: v0.y - p.y
+        };
+        let u = Vertex3::cross(a, b);
         if u.z.abs() < 1.0 {
             return Vertex3::<f32> {
                 x: -1.0,
@@ -164,6 +207,25 @@ impl Sub for Vertex3<f32> {
             x: self.x - rhs.x,
             y: self.y - rhs.y,
             z: self.z - rhs.z,
+        }
+    }
+}
+
+impl Mul<Vertex2<f32>> for Vertex2<f32> {
+    type Output = f32;
+
+    fn mul(self, rhs: Vertex2<f32>) -> f32 {
+        self.x * rhs.x + self.y * rhs.y
+    }
+}
+
+impl Mul<f32> for Vertex2<f32> {
+    type Output = Vertex2<f32>;
+
+    fn mul(self, rhs: f32) -> Vertex2<f32> {
+        Vertex2::<f32> {
+            x: self.x * rhs,
+            y: self.y * rhs,
         }
     }
 }

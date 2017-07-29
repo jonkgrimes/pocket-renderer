@@ -84,6 +84,13 @@ impl Model {
         }
     }
 
+    pub fn uv(&self, uv: Vertex2<f32>) -> &image::Rgba<u8> {
+        let imgbuf = self.texture_image.as_rgba8().unwrap();
+        let height = imgbuf.height();
+        let width = imgbuf.width();
+        imgbuf.get_pixel(uv.x as u32 * height, uv.y as u32 * width)
+    }
+
     pub fn verts_len(&self) -> usize {
         self.verts.len()
     }

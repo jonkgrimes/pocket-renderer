@@ -53,6 +53,7 @@ fn main() {
         if intensity > 0.0 {
             renderer::triangle(&screen_coords,
                                &texture_coords,
+                               &model.texture_image,
                                &mut zbuffer,
                                intensity,
                                &mut imgbuf)
