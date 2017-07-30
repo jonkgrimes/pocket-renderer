@@ -2,7 +2,6 @@ use std::ops::Add;
 use std::ops::Mul;
 use std::ops::Sub;
 use std::f32;
-use std::vec;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vertex3<T> {
@@ -27,23 +26,25 @@ impl Matrix {
         Matrix { m: Vec::new() }
     }
 
+    pub fn get(&self, x: usize, y: usize) -> f32 {
+        self.m[x][y]
+    }
+
     pub fn with_capacity(size: usize) -> Matrix {
-        Matrix { m: Vec::with_capacity(size) }
+        Matrix { m: vec![vec![0.0; size]; size] }
     }
 
     pub fn identity(size: usize) -> Matrix {
-        let mut m = Matrix::new();
-        for i in 0..(size + 1) {
-            let row = Vec::with_capacity(size);
-            for j in 0..(size+1) {
+        let mut matrix = Matrix::with_capacity(size);
+        for i in 0..size {
+            for j in 0..size {
                 match i == j {
-                    true => row.push(1.0),
-                    false => row.push(0.0),
+                    true => matrix.m[i][j] = 1.0,
+                    false => matrix.m[i][j] = 0.0,
                 }
             }
-            m.m.push(row);
         }
-        m
+        matrix
     }
 }
 
@@ -53,7 +54,7 @@ impl PartialEq for Matrix {
         let columns = self.m[0].len();
         for x in 0..rows {
             for y in 0..columns {
-                match self[x][y] == other[x][y] {
+                match self.get(x,y) == other.get(x,y) {
                     true => return true,
                     false => return false
                 }
@@ -344,15 +345,17 @@ mod tests {
 
     #[test]
     fn matrix_equal() {
-        let actual = Matrix::new();
-        let expected = Matrix::new();
-        assert!(actual == expected);
+        let a = Matrix {m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
+        let b = Matrix {m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
+        assert!(a == b);
     }
 
     #[test]
     fn matrix_identity() {
         let actual = Matrix::identity(3);
-        let expected = vec!([vec!([1.0,0.0,0.0]),vec!([0.0,1.0,0.0]),vec!([0.0,0.0,1.0])]);
-        assert!(actual.m == expected);
+        let expected = Matrix {m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
+        println!("{:?}", actual);
+        println!("{:?}", expected);
+        assert!(actual == expected);
     }
 }
