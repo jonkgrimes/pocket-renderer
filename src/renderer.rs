@@ -1,7 +1,6 @@
 extern crate image;
 
-use geometry::Vertex2;
-use geometry::Vertex3;
+use geometry::{Vertex2, Vertex3, Matrix};
 use image::{DynamicImage, ImageBuffer, RgbaImage, Pixel};
 use std::mem;
 use std::f32;
@@ -10,6 +9,10 @@ use std::f32;
 struct Point {
     x: i32,
     y: i32,
+}
+
+pub fn viewport(x: u32, y: u32, h: u32, w: u32) -> Matrix {
+    let m = Matrix::identity(4);
 }
 
 pub fn triangle(verts: &[Vertex3<f32>; 3],

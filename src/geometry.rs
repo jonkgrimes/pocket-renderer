@@ -2,6 +2,7 @@ use std::ops::Add;
 use std::ops::Mul;
 use std::ops::Sub;
 use std::f32;
+use std::vec;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vertex3<T> {
@@ -14,6 +15,52 @@ pub struct Vertex3<T> {
 pub struct Vertex2<T> {
     pub x: T,
     pub y: T,
+}
+
+#[derive(Debug, Clone)]
+pub struct Matrix {
+    pub m: Vec<Vec<f32>>,
+}
+
+impl Matrix {
+    pub fn new() -> Matrix {
+        Matrix { m: Vec::new() }
+    }
+
+    pub fn with_capacity(size: usize) -> Matrix {
+        Matrix { m: Vec::with_capacity(size) }
+    }
+
+    pub fn identity(size: usize) -> Matrix {
+        let mut m = Matrix::new();
+        for i in 0..(size + 1) {
+            let row = Vec::with_capacity(size);
+            for j in 0..(size+1) {
+                match i == j {
+                    true => row.push(1.0),
+                    false => row.push(0.0),
+                }
+            }
+            m.m.push(row);
+        }
+        m
+    }
+}
+
+impl PartialEq for Matrix {
+    fn eq(&self, other: &Self) -> bool {
+        let rows = self.m.len();
+        let columns = self.m[0].len();
+        for x in 0..rows {
+            for y in 0..columns {
+                match self[x][y] == other[x][y] {
+                    true => return true,
+                    false => return false
+                }
+            }
+        }
+        true
+    }
 }
 
 pub struct Scalar {
@@ -293,5 +340,19 @@ mod tests {
         let actual = a - b;
         let expected = Vertex2::<i32> { x: 2, y: 2 };
         assert!(actual == expected);
+    }
+
+    #[test]
+    fn matrix_equal() {
+        let actual = Matrix::new();
+        let expected = Matrix::new();
+        assert!(actual == expected);
+    }
+
+    #[test]
+    fn matrix_identity() {
+        let actual = Matrix::identity(3);
+        let expected = vec!([vec!([1.0,0.0,0.0]),vec!([0.0,1.0,0.0]),vec!([0.0,0.0,1.0])]);
+        assert!(actual.m == expected);
     }
 }
