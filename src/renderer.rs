@@ -20,7 +20,7 @@ pub fn triangle(verts: &[Vertex3<f32>; 3],
                 imgbuf: &mut RgbaImage) {
     let height = (imgbuf.height() - 1) as f32;
     let width = (imgbuf.width() - 1) as f32;
-    let texture_buf = texture_map.as_rgba8().unwrap();
+    let texture_buf = texture_map.as_rgb8().unwrap();
     let texture_buf_height = texture_buf.height();
     let texture_buf_width  = texture_buf.width();
     let mut bboxmin = Vertex2::<f32> {
@@ -47,11 +47,6 @@ pub fn triangle(verts: &[Vertex3<f32>; 3],
         y: bboxmin.y as f32,
         z: 0.0,
     };
-    let mut p_uv = Vertex2::<f32> {
-        x: bboxmin.x as f32,
-        y: bboxmin.y as f32
-    };
-
     for x in (bboxmin.x as u32)..(bboxmax.x as u32 + 1) {
         for y in (bboxmin.y as u32)..(bboxmax.y as u32 + 1) {
             p.x = x as f32;
@@ -60,19 +55,18 @@ pub fn triangle(verts: &[Vertex3<f32>; 3],
             if bc_screen.x < 0.0 || bc_screen.y < 0.0 || bc_screen.z < 0.0 {
                 continue;
             }
-            p_uv = textures[0] * bc_screen.x + textures[1] * bc_screen.y + textures[2] * bc_screen.z;
-
+            let p_uv = textures[0] * bc_screen.x + textures[1] * bc_screen.y + textures[2] * bc_screen.z;
             p.z = 0.0;
             p.z += verts[0].z * bc_screen.x;
             p.z += verts[1].z * bc_screen.y;
             p.z += verts[2].z * bc_screen.z;
             let zbuff_idx = (p.x + p.y * width) as usize;
             if zbuffer[zbuff_idx - 1] < p.z {
+                let texture_x = p_uv.x * texture_buf_height as f32;
+                let texture_y = p_uv.y * texture_buf_width as f32;
+                let texture_pixel = texture_buf.get_pixel(texture_x as u32, texture_y as u32);
+                let pixel = image::Rgba([texture_pixel[0], texture_pixel[1], texture_pixel[2], 255u8]);
                 zbuffer[zbuff_idx - 1] = p.z;
-                let texture_x = p_uv.x as u32 * texture_buf_height;
-                let texture_y = p_uv.y as u32 * texture_buf_width;
-                let texture_pixel = texture_buf.get_pixel(texture_x, texture_y);
-                let pixel = image::Rgba([texture_pixel[0] * intensity as u8, texture_pixel[1] * intensity as u8, texture_pixel[2] * intensity as u8, 255u8]);
                 imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
             }
         }
