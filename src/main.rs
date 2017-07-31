@@ -5,7 +5,7 @@ use std::path::Path;
 use std::f32;
 use image::ImageBuffer;
 use model::Model;
-use geometry::{Vertex2, Vertex3};
+use geometry::{Vertex2, Vertex3, Matrix};
 
 pub mod model;
 pub mod geometry;
@@ -13,6 +13,7 @@ pub mod renderer;
 
 const WIDTH: u32 = 800;
 const HEIGHT: u32 = 800;
+const DEPTH: u32 = 255;
 const ZBUFFER_SIZE: usize = ((WIDTH + 1) * (HEIGHT + 1)) as usize;
 
 fn main() {
@@ -24,6 +25,9 @@ fn main() {
         y: 0.0,
         z: -1.0,
     };
+
+    let projection = Matrix::identity(4);
+    let viewport = renderer::viewport(WIDTH / 8, HEIGHT / 8, WIDTH / 3/4, HEIGHT / 3/4, DEPTH);
 
     let mut zbuffer: [f32; ZBUFFER_SIZE] = [f32::NEG_INFINITY; ZBUFFER_SIZE];
 
@@ -44,7 +48,7 @@ fn main() {
             let texture_index = face.get_texture(i) as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
             texture_coords[i] = *model.textures.get(texture_index).unwrap();
-            screen_coords[i] = world_coords[i].to_screen(HEIGHT, WIDTH);
+            screen_coords[i] = (viewport * projection * world_coords[i].to_matrix()).to_vector();
         }
         let mut n = Vertex3::cross((world_coords[2] - world_coords[0]),
                                    (world_coords[1] - world_coords[0]));

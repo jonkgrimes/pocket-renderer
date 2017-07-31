@@ -18,20 +18,34 @@ pub struct Vertex2<T> {
 
 #[derive(Debug, Clone)]
 pub struct Matrix {
+    rows: usize,
+    columns: usize,
     pub m: Vec<Vec<f32>>,
 }
 
 impl Matrix {
-    pub fn new() -> Matrix {
-        Matrix { m: Vec::new() }
+    pub fn new(rows: usize, cols: usize) -> Matrix {
+        Matrix { rows: rows, columns: cols, m: vec![vec![0.0; cols]; rows] }
+    }
+
+    pub fn rows(&self) -> usize {
+        self.rows
+    }
+    
+    pub fn columns(&self) -> usize {
+        self.columns
     }
 
     pub fn get(&self, x: usize, y: usize) -> f32 {
         self.m[x][y]
     }
 
+    pub fn set(&mut self, x: usize, y: usize, value: f32) {
+        self.m[x][y] = value
+    }
+
     pub fn with_capacity(size: usize) -> Matrix {
-        Matrix { m: vec![vec![0.0; size]; size] }
+        Matrix::new(size,size)
     }
 
     pub fn identity(size: usize) -> Matrix {
@@ -50,8 +64,8 @@ impl Matrix {
 
 impl PartialEq for Matrix {
     fn eq(&self, other: &Self) -> bool {
-        let rows = self.m.len();
-        let columns = self.m[0].len();
+        let rows = self.rows();
+        let columns = self.columns();
         for x in 0..rows {
             for y in 0..columns {
                 match self.get(x,y) == other.get(x,y) {
@@ -61,6 +75,15 @@ impl PartialEq for Matrix {
             }
         }
         true
+    }
+}
+
+impl Mul<Matrix> for Matrix {
+    type Output = Matrix;
+
+    fn mul(self, rhs: Matrix) -> Matrix {
+      assert!(self.columns == rhs.rows);
+      Matrix::new(1,1)
     }
 }
 
@@ -345,17 +368,26 @@ mod tests {
 
     #[test]
     fn matrix_equal() {
-        let a = Matrix {m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
-        let b = Matrix {m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
+        let a = Matrix {rows: 3, columns: 3, m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
+        let b = Matrix {rows: 3, columns: 3, m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
         assert!(a == b);
     }
 
     #[test]
     fn matrix_identity() {
         let actual = Matrix::identity(3);
-        let expected = Matrix {m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
+        let expected = Matrix {rows: 3, columns: 3, m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
         println!("{:?}", actual);
         println!("{:?}", expected);
+        assert!(actual == expected);
+    }
+
+    #[test]
+    fn matrix_multiplication() {
+        let a = Matrix {rows: 2, columns: 2, m: vec!(vec!(2.0,1.0),vec!(2.0,2.0))};
+        let b = Matrix {rows: 2, columns: 1, m: vec!(vec!(2.0),vec!(3.0))};
+        let actual = a * b;
+        let expected = Matrix {rows: 2, columns: 1, m: vec!(vec!(8.0),vec!(10.0))};
         assert!(actual == expected);
     }
 }
