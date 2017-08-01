@@ -60,6 +60,14 @@ impl Matrix {
         }
         matrix
     }
+
+    pub fn to_vector(&self) -> Vertex3<f32> {
+        Vertex3::<f32> {
+            x: self.get(0,0) / self.get(3,0),
+            y: self.get(1,0) / self.get(3,0),
+            z: self.get(2,0) / self.get(3,0),
+        }
+    }
 }
 
 impl PartialEq for Matrix {
@@ -83,7 +91,16 @@ impl Mul<Matrix> for Matrix {
 
     fn mul(self, rhs: Matrix) -> Matrix {
       assert!(self.columns == rhs.rows);
-      Matrix::new(1,1)
+      let mut result = Matrix::new(self.rows, rhs.columns);
+      for i in 0..self.rows {
+          for j in 0..rhs.columns {
+              for k in 0..self.columns {
+                  let value = result.get(i, j) + (self.get(i, k) * rhs.get(k, j));
+                  result.set(i, j, value);
+              }
+          }
+      }
+      result
     }
 }
 
@@ -123,6 +140,10 @@ impl Vertex3<f32> {
             y: ((self.y + 1.0) * height as f32 / 2.0) + 0.5,
             z: self.z,
         }
+    }
+
+    pub fn to_matrix(&self) -> Matrix {
+        Matrix { rows: 4, columns: 1, m: vec!(vec!(self.x),vec!(self.y),vec!(self.z),vec!(1.0)) }
     }
 }
 
@@ -377,8 +398,6 @@ mod tests {
     fn matrix_identity() {
         let actual = Matrix::identity(3);
         let expected = Matrix {rows: 3, columns: 3, m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
-        println!("{:?}", actual);
-        println!("{:?}", expected);
         assert!(actual == expected);
     }
 
@@ -387,7 +406,7 @@ mod tests {
         let a = Matrix {rows: 2, columns: 2, m: vec!(vec!(2.0,1.0),vec!(2.0,2.0))};
         let b = Matrix {rows: 2, columns: 1, m: vec!(vec!(2.0),vec!(3.0))};
         let actual = a * b;
-        let expected = Matrix {rows: 2, columns: 1, m: vec!(vec!(8.0),vec!(10.0))};
+        let expected = Matrix {rows: 2, columns: 1, m: vec!(vec!(7.0),vec!(10.0))};
         assert!(actual == expected);
     }
 }

@@ -48,7 +48,7 @@ fn main() {
             let texture_index = face.get_texture(i) as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
             texture_coords[i] = *model.textures.get(texture_index).unwrap();
-            screen_coords[i] = (viewport * projection * world_coords[i].to_matrix()).to_vector();
+            screen_coords[i] = (viewport.clone() * projection.clone() * world_coords[i].to_matrix()).to_vector();
         }
         let mut n = Vertex3::cross((world_coords[2] - world_coords[0]),
                                    (world_coords[1] - world_coords[0]));
