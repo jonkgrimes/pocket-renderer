@@ -25,9 +25,15 @@ fn main() {
         y: 0.0,
         z: -1.0,
     };
+    let camera = Vertex3::<f32> {
+        x: 0.0,
+        y: 0.0,
+        z: 3.0,
+    };
 
-    let projection = Matrix::identity(4);
-    let viewport = renderer::viewport(WIDTH / 8, HEIGHT / 8, WIDTH / 3/4, HEIGHT / 3/4, DEPTH);
+    let mut projection = Matrix::identity(4);
+    let viewport = renderer::viewport(WIDTH / 8, HEIGHT / 8, WIDTH * 3/4, HEIGHT * 3/4, DEPTH);
+    projection.set(3, 2, -1.0 / camera.z);
 
     let mut zbuffer: [f32; ZBUFFER_SIZE] = [f32::NEG_INFINITY; ZBUFFER_SIZE];
 
