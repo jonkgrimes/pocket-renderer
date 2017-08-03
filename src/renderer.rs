@@ -25,10 +25,9 @@ pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix {
 
 pub fn triangle(verts: &[Vertex3<f32>; 3],
                 textures: &[Vertex2<f32>; 3],
-                normals: &[Vertex3<f32>; 3],
+                intensity: &[f32; 3],
                 texture_map: &DynamicImage,
                 zbuffer: &mut [f32],
-                intensity: f32,
                 imgbuf: &mut RgbaImage) {
     let height = (imgbuf.height() - 1) as f32;
     let width = (imgbuf.width() - 1) as f32;
@@ -77,9 +76,9 @@ pub fn triangle(verts: &[Vertex3<f32>; 3],
                 let texture_x = p_uv.x * texture_buf_height as f32;
                 let texture_y = p_uv.y * texture_buf_width as f32;
                 let texture_pixel = texture_buf.get_pixel(texture_x as u32, texture_y as u32);
-                let pixel = image::Rgba([(texture_pixel[0] as f32 * intensity) as u8,
-                                         (texture_pixel[1] as f32 * intensity) as u8, 
-                                         (texture_pixel[2] as f32 * intensity) as u8, 255u8]);
+                let pixel = image::Rgba([(255.0 * intensity[0]) as u8,
+                                         (255.0 * intensity[1]) as u8, 
+                                         (255.0 * intensity[2]) as u8, 255u8]);
                 zbuffer[zbuff_idx - 1] = p.z;
                 imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
             }
