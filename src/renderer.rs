@@ -25,6 +25,7 @@ pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix {
 
 pub fn triangle(verts: &[Vertex3<f32>; 3],
                 textures: &[Vertex2<f32>; 3],
+                normals: &[Vertex3<f32>; 3],
                 texture_map: &DynamicImage,
                 zbuffer: &mut [f32],
                 intensity: f32,

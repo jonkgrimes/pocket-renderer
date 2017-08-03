@@ -134,6 +134,10 @@ impl<T> Vertex3<T> {
 }
 
 impl Vertex3<f32> {
+    pub fn new() -> Vertex3<f32> {
+        Vertex3 { x: 0.0, y: 0.0, z: 0.0 }
+    }
+
     pub fn to_screen(&self, height: u32, width: u32) -> Vertex3<f32> {
         Vertex3::<f32> {
             x: ((self.x + 1.0) * width as f32 / 2.0) + 0.5,

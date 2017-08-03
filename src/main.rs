@@ -38,22 +38,17 @@ fn main() {
     let mut zbuffer: [f32; ZBUFFER_SIZE] = [f32::NEG_INFINITY; ZBUFFER_SIZE];
 
     for face in model.faces {
-        let mut screen_coords: [Vertex3<f32>; 3] = [Vertex3::<f32> {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        }; 3];
-        let mut world_coords: [Vertex3<f32>; 3] = [Vertex3::<f32> {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        }; 3];
+        let mut screen_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
+        let mut world_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
+        let mut normal_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
         let mut texture_coords: [Vertex2<f32>; 3] = [Vertex2::<f32> { x: 0.0, y: 0.0 }; 3];
         for i in 0..3 {
             let vertex_index = face.get_vertex(i) as usize;
             let texture_index = face.get_texture(i) as usize;
+            let normal_index = face.get_normal(i) as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
             texture_coords[i] = *model.textures.get(texture_index).unwrap();
+            normal_coords[i] = *model.normals.get(normal_index).unwrap();
             screen_coords[i] = (viewport.clone() * projection.clone() * world_coords[i].to_matrix()).to_vector();
         }
         let mut n = Vertex3::cross((world_coords[2] - world_coords[0]),
@@ -63,6 +58,7 @@ fn main() {
         if intensity > 0.0 {
             renderer::triangle(&screen_coords,
                                &texture_coords,
+                               &normal_coords,
                                &model.texture_image,
                                &mut zbuffer,
                                intensity,

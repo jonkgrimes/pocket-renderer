@@ -14,6 +14,7 @@ use geometry::Vertex3;
 pub struct Model {
     pub verts: Vec<Vertex3<f32>>,
     pub textures: Vec<Vertex2<f32>>,
+    pub normals: Vec<Vertex3<f32>>,
     pub faces: Vec<Face>,
     pub texture_image: DynamicImage,
 }
@@ -22,6 +23,7 @@ pub struct Model {
 pub struct Face {
     pub vertexes: [u32; 3],
     pub textures: [u32; 3],
+    pub normals:  [u32; 3],
 }
 
 impl Face {
@@ -32,12 +34,17 @@ impl Face {
     pub fn get_texture(&self, i: usize) -> u32 {
         self.textures[i]
     }
+    
+    pub fn get_normal(&self, i: usize) -> u32 {
+        self.normals[i]
+    }
 }
 
 impl Model {
     pub fn new(path: &str) -> Model {
         let mut verts: Vec<Vertex3<f32>> = Vec::new();
         let mut textures: Vec<Vertex2<f32>> = Vec::new();
+        let mut normals: Vec<Vertex3<f32>> = Vec::new();
         let mut faces: Vec<Face> = Vec::new();
         let file = File::open(Path::new(&format!("models/{}.obj", path)));
         let buf_reader = BufReader::new(file.unwrap());
@@ -70,16 +77,25 @@ impl Model {
                 textures.push(Vertex2 { x: x, y: y });
             }
 
+            if values[0] == "vn" {
+                let x: f32 = values[2].parse().unwrap();
+                let y: f32 = values[3].parse().unwrap();
+                let z: f32 = values[4].parse().unwrap();
+                normals.push(Vertex3 { x: x, y: y, z: z });
+            }
+
             // parse out the faces which are of the following format
             // f vertex0_idx/texture_idx/normal_idx vertex1_idx/...
             if values[0] == "f" {
                 let mut face = Face {
                     vertexes: [0; 3],
                     textures: [0; 3],
+                    normals:  [0; 3],
                 };
                 for i in 0..3 {
                     face.vertexes[i] = *parse_face_string(values[i + 1]).get(0).unwrap();
                     face.textures[i] = *parse_face_string(values[i + 1]).get(1).unwrap();
+                    face.normals[i] = *parse_face_string(values[i + 1]).get(2).unwrap();
                 }
                 faces.push(face);
             }
@@ -87,6 +103,7 @@ impl Model {
         Model {
             verts: verts,
             faces: faces,
+            normals: normals,
             textures: textures,
             texture_image: texture_image,
         }
