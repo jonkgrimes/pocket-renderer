@@ -20,20 +20,15 @@ fn main() {
     // +1 hack to get over the out of bounds errors
     let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
     let model = Model::new("african_head");
-    let light_dir = Vertex3::<f32> {
-        x: 0.0,
-        y: 0.0,
-        z: -1.0,
-    };
-    let camera = Vertex3::<f32> {
-        x: 0.0,
-        y: 0.0,
-        z: 3.0,
-    };
+    let mut light_dir = Vertex3::<f32> { x: 0.0, y: -1.0, z: 1.0, };
+    light_dir = light_dir.normalize();
+    let eye = Vertex3::<f32> { x: 1.0, y: 1.0, z: 3.0, };
+    let center = Vertex3::new();
 
     let mut projection = Matrix::identity(4);
     let viewport = renderer::viewport(WIDTH / 8, HEIGHT / 8, WIDTH * 3/4, HEIGHT * 3/4, DEPTH);
-    projection.set(3, 2, -1.0 / camera.z);
+    let model_view = renderer::lookat(eye, center, Vertex3::<f32> { x: 0.0, y: 1.0, z: 0.0 });
+    projection.set(3, 2, -1.0 / ((eye - center).norm()));
 
     let mut zbuffer: [f32; ZBUFFER_SIZE] = [f32::NEG_INFINITY; ZBUFFER_SIZE];
 
@@ -51,7 +46,7 @@ fn main() {
             texture_coords[i] = *model.textures.get(texture_index).unwrap();
             normal_coords[i] = *model.normals.get(normal_index).unwrap();
             normals[i] = normal_coords[i].normalize() * light_dir;
-            screen_coords[i] = (viewport.clone() * projection.clone() * world_coords[i].to_matrix()).to_vector();
+            screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone()  * world_coords[i].to_matrix()).to_vector();
         }
         let mut n = Vertex3::cross((world_coords[2] - world_coords[0]),
                                    (world_coords[1] - world_coords[0]));

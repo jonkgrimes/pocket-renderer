@@ -11,6 +11,20 @@ struct Point {
     y: i32,
 }
 
+pub fn lookat(eye: Vertex3<f32>, center: Vertex3<f32>, up: Vertex3<f32>) -> Matrix {
+    let z = (eye - center).normalize();
+    let x = Vertex3::cross(up, z).normalize();
+    let y = Vertex3::cross(z, x).normalize();
+    let mut result = Matrix::identity(4);
+    for i in 0..3 {
+        result.set(0, i, *x.at(i as i32).unwrap());
+        result.set(1, i, *y.at(i as i32).unwrap());
+        result.set(2, i, *z.at(i as i32).unwrap());
+        result.set(i, 3, -center.at(i as i32).unwrap());
+    }
+    result
+}
+
 pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix {
     let mut m = Matrix::identity(4);
     m.set(0,3, (x + w) as f32 / 2.0);
