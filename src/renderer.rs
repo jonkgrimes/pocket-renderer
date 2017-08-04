@@ -81,6 +81,7 @@ pub fn triangle(verts: &[Vertex3<f32>; 3],
                 continue;
             }
             let p_uv = textures[0] * bc_screen.x + textures[1] * bc_screen.y + textures[2] * bc_screen.z;
+            let p_intensity = intensity[0] * bc_screen.x + intensity[1] * bc_screen.y + intensity[2] * bc_screen.z;
             p.z = 0.0;
             p.z += verts[0].z * bc_screen.x;
             p.z += verts[1].z * bc_screen.y;
@@ -90,9 +91,9 @@ pub fn triangle(verts: &[Vertex3<f32>; 3],
                 let texture_x = p_uv.x * texture_buf_height as f32;
                 let texture_y = p_uv.y * texture_buf_width as f32;
                 let texture_pixel = texture_buf.get_pixel(texture_x as u32, texture_y as u32);
-                let pixel = image::Rgba([(255.0 * intensity[0]) as u8,
-                                         (255.0 * intensity[1]) as u8, 
-                                         (255.0 * intensity[2]) as u8, 255u8]);
+                let pixel = image::Rgba([(255.0 * p_intensity) as u8,
+                                         (255.0 * p_intensity) as u8, 
+                                         (255.0 * p_intensity) as u8, 255u8]);
                 zbuffer[zbuff_idx - 1] = p.z;
                 imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
             }

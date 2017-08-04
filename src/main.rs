@@ -20,7 +20,7 @@ fn main() {
     // +1 hack to get over the out of bounds errors
     let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
     let model = Model::new("african_head");
-    let mut light_dir = Vertex3::<f32> { x: 0.0, y: -1.0, z: 1.0, };
+    let mut light_dir = Vertex3::<f32> { x: 1.0, y: -1.0, z: 1.0, };
     light_dir = light_dir.normalize();
     let eye = Vertex3::<f32> { x: 1.0, y: 1.0, z: 3.0, };
     let center = Vertex3::new();
@@ -38,6 +38,7 @@ fn main() {
         let mut normal_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
         let mut normals: [f32; 3] = [0.0; 3];
         let mut texture_coords: [Vertex2<f32>; 3] = [Vertex2::<f32> { x: 0.0, y: 0.0 }; 3];
+
         for i in 0..3 {
             let vertex_index = face.get_vertex(i) as usize;
             let texture_index = face.get_texture(i) as usize;
@@ -48,18 +49,13 @@ fn main() {
             normals[i] = normal_coords[i].normalize() * light_dir;
             screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone()  * world_coords[i].to_matrix()).to_vector();
         }
-        let mut n = Vertex3::cross((world_coords[2] - world_coords[0]),
-                                   (world_coords[1] - world_coords[0]));
-        n = n.normalize();
-        let intensity = n * light_dir;
-        if intensity > 0.0 {
-            renderer::triangle(&screen_coords,
-                               &texture_coords,
-                               &normals,
-                               &model.texture_image,
-                               &mut zbuffer,
-                               &mut imgbuf)
-        }
+
+        renderer::triangle(&screen_coords,
+                            &texture_coords,
+                            &normals,
+                            &model.texture_image,
+                            &mut zbuffer,
+                            &mut imgbuf)
     }
 
     let ref mut fout = File::create(&Path::new("rendered.png")).unwrap();
