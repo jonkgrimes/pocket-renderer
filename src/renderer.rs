@@ -1,7 +1,7 @@
 extern crate image;
 
 use geometry::{Vertex2, Vertex3, Matrix};
-use image::{DynamicImage, ImageBuffer, RgbaImage, Pixel};
+use image::{DynamicImage, ImageBuffer, RgbImage, Pixel};
 use std::mem;
 use std::f32;
 
@@ -42,7 +42,7 @@ pub fn triangle(verts: &[Vertex3<f32>; 3],
                 intensity: &[f32; 3],
                 texture_map: &DynamicImage,
                 zbuffer: &mut [f32],
-                imgbuf: &mut RgbaImage) {
+                imgbuf: &mut RgbImage) {
     let height = (imgbuf.height() - 1) as f32;
     let width = (imgbuf.width() - 1) as f32;
     let texture_buf = texture_map.as_rgb8().unwrap();
@@ -60,6 +60,7 @@ pub fn triangle(verts: &[Vertex3<f32>; 3],
         x: width,
         y: height,
     };
+
     for i in 0..3 {
         bboxmin.x = 0f32.max(bboxmin.x.min(verts[i].x));
         bboxmax.x = clamp.x.min(bboxmax.x.max(verts[i].x));
@@ -81,7 +82,8 @@ pub fn triangle(verts: &[Vertex3<f32>; 3],
                 continue;
             }
             let p_uv = textures[0] * bc_screen.x + textures[1] * bc_screen.y + textures[2] * bc_screen.z;
-            let p_intensity = intensity[0] * bc_screen.x + intensity[1] * bc_screen.y + intensity[2] * bc_screen.z;
+            let mut p_intensity = intensity[0] * bc_screen.x + intensity[1] * bc_screen.y + intensity[2] * bc_screen.z;
+            p_intensity = 0f32.max(p_intensity.min(1.0));
             p.z = 0.0;
             p.z += verts[0].z * bc_screen.x;
             p.z += verts[1].z * bc_screen.y;
@@ -91,9 +93,9 @@ pub fn triangle(verts: &[Vertex3<f32>; 3],
                 let texture_x = p_uv.x * texture_buf_height as f32;
                 let texture_y = p_uv.y * texture_buf_width as f32;
                 let texture_pixel = texture_buf.get_pixel(texture_x as u32, texture_y as u32);
-                let pixel = image::Rgba([(255.0 * p_intensity) as u8,
-                                         (255.0 * p_intensity) as u8, 
-                                         (255.0 * p_intensity) as u8, 255u8]);
+                let pixel = image::Rgb([(texture_pixel[0] as f32 * p_intensity) as u8,
+                                        (texture_pixel[1] as f32 * p_intensity) as u8, 
+                                        (texture_pixel[2] as f32 * p_intensity) as u8]);
                 zbuffer[zbuff_idx - 1] = p.z;
                 imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
             }

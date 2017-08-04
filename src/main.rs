@@ -59,5 +59,5 @@ fn main() {
     }
 
     let ref mut fout = File::create(&Path::new("rendered.png")).unwrap();
-    let _ = image::ImageRgba8(image::imageops::flip_vertical(&imgbuf)).save(fout, image::PNG);
+    let _ = image::ImageRgb8(image::imageops::flip_vertical(&imgbuf)).save(fout, image::PNG);
 }
