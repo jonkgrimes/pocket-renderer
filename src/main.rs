@@ -5,7 +5,7 @@ use std::path::Path;
 use std::f32;
 use image::ImageBuffer;
 use model::Model;
-use geometry::{Vertex2, Vertex3, Matrix};
+use geometry::{Vertex2, Vertex3};
 
 pub mod model;
 pub mod geometry;
@@ -20,15 +20,14 @@ fn main() {
     // +1 hack to get over the out of bounds errors
     let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
     let model = Model::new("african_head");
-    let mut light_dir = Vertex3::<f32> { x: 1.0, y: -1.0, z: 1.0, };
-    light_dir = light_dir.normalize();
-    let eye = Vertex3::<f32> { x: 1.0, y: 1.0, z: 3.0, };
+    let light_dir = Vertex3::init(1.0, 1.0, 1.0).normalize();
+    let up = Vertex3::init(0.0, 1.0, 0.0);
+    let eye = Vertex3::init(1.0, 1.0, 3.0);
     let center = Vertex3::new();
 
-    let mut projection = Matrix::identity(4);
+    let projection = renderer::projection(eye, center);
     let viewport = renderer::viewport(WIDTH / 8, HEIGHT / 8, WIDTH * 3/4, HEIGHT * 3/4, DEPTH);
-    let model_view = renderer::lookat(eye, center, Vertex3::<f32> { x: 0.0, y: 1.0, z: 0.0 });
-    projection.set(3, 2, -1.0 / ((eye - center).norm()));
+    let model_view = renderer::lookat(eye, center, up);
 
     let mut zbuffer: [f32; ZBUFFER_SIZE] = [f32::NEG_INFINITY; ZBUFFER_SIZE];
 

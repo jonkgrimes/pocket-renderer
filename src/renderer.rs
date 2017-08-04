@@ -18,6 +18,12 @@ pub fn lookat(eye: Vertex3<f32>, center: Vertex3<f32>, up: Vertex3<f32>) -> Matr
     result
 }
 
+pub fn projection(eye: Vertex3<f32>, center: Vertex3<f32>) -> Matrix {
+  let mut result = Matrix::identity(4);   
+  result.set(3, 2, -1.0 / ((eye - center).norm()));
+  result
+}
+
 pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix {
     let mut m = Matrix::identity(4);
     m.set(0,3, (x + w) as f32 / 2.0);
