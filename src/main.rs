@@ -6,6 +6,7 @@ use std::f32;
 use image::ImageBuffer;
 use model::Model;
 use geometry::{Vertex2, Vertex3};
+use renderer::GouradShader;
 
 pub mod model;
 pub mod geometry;
@@ -35,7 +36,6 @@ fn main() {
         let mut screen_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
         let mut world_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
         let mut normal_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
-        let mut normals: [f32; 3] = [0.0; 3];
         let mut texture_coords: [Vertex2<f32>; 3] = [Vertex2::<f32> { x: 0.0, y: 0.0 }; 3];
 
         for i in 0..3 {
@@ -45,16 +45,16 @@ fn main() {
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
             texture_coords[i] = *model.textures.get(texture_index).unwrap();
             normal_coords[i] = *model.normals.get(normal_index).unwrap();
-            normals[i] = normal_coords[i].normalize() * light_dir;
             screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone()  * world_coords[i].to_matrix()).to_vector();
         }
+        let shader = GouradShader::new(normal_coords, light_dir);
 
         renderer::triangle(&screen_coords,
-                            &texture_coords,
-                            &normals,
-                            &model.texture_image,
-                            &mut zbuffer,
-                            &mut imgbuf)
+                           &texture_coords,
+                           shader,
+                           &model.texture_image,
+                           &mut zbuffer,
+                           &mut imgbuf)
     }
 
     let ref mut fout = File::create(&Path::new("rendered.png")).unwrap();
