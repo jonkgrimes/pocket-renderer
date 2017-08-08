@@ -5,6 +5,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
 use std::vec::Vec;
+use std::ops::Deref;
 use std::f32;
 use image::DynamicImage;
 
@@ -19,11 +20,19 @@ pub struct Model {
     pub texture_image: DynamicImage,
 }
 
-#[derive(Debug)]
+#[derive(Debug,Copy,Clone)]
 pub struct Face {
     pub vertexes: [u32; 3],
     pub textures: [u32; 3],
     pub normals:  [u32; 3],
+}
+
+impl Deref for Model {
+    type Target = Vec<Face>;
+
+    fn deref(&self) -> &Vec<Face> {
+        &self.faces
+    }
 }
 
 impl Face {

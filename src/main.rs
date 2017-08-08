@@ -22,9 +22,9 @@ fn main() {
     let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
     let model = Model::new("african_head");
     let light_dir = Vertex3::init(1.0, 1.0, 1.0).normalize();
-    let up = Vertex3::init(0.0, 1.0, 0.0);
-    let eye = Vertex3::init(1.0, 1.0, 3.0);
-    let center = Vertex3::new();
+    let up =        Vertex3::init(0.0, 1.0, 0.0);
+    let eye =       Vertex3::init(1.0, 1.0, 3.0);
+    let center =    Vertex3::new();
 
     let projection = renderer::projection(eye, center);
     let viewport = renderer::viewport(WIDTH / 8, HEIGHT / 8, WIDTH * 3/4, HEIGHT * 3/4, DEPTH);
@@ -32,7 +32,7 @@ fn main() {
 
     let mut zbuffer: [f32; ZBUFFER_SIZE] = [f32::NEG_INFINITY; ZBUFFER_SIZE];
 
-    for face in model.faces {
+    for face in model.faces.clone() {
         let mut screen_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
         let mut world_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
         let mut normal_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
@@ -47,7 +47,7 @@ fn main() {
             normal_coords[i] = *model.normals.get(normal_index).unwrap();
             screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone()  * world_coords[i].to_matrix()).to_vector();
         }
-        let shader = GouradShader::new(normal_coords, light_dir);
+        let shader = GouradShader::new(&model, &face, light_dir);
 
         renderer::triangle(&screen_coords,
                            &texture_coords,

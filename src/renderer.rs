@@ -1,11 +1,12 @@
 extern crate image;
 
 use geometry::{Vertex2, Vertex3, Matrix};
+use model::{Model,Face};
 use image::{DynamicImage, RgbImage};
 use std::f32;
 
 pub trait Shader {
-    fn fragment(&self, bar: Vertex3<f32>) -> image::Rgb<u8>;
+    fn fragment(&self, bar: Vertex3<f32>, pixel: image::Rgb<u8>) -> image::Rgb<u8>;
 }
 
 pub struct GouradShader {
@@ -13,22 +14,24 @@ pub struct GouradShader {
 }
 
 impl GouradShader {
-    pub fn new(normals: [Vertex3<f32>; 3], light_dir: Vertex3<f32>) -> GouradShader {
-        let mut intensity: [f32; 3] = [1.0, 1.0, 1.0];
+    pub fn new(model: &Model, face: &Face, light_dir: Vertex3<f32>) -> GouradShader {
+        let mut intensity: [f32; 3] = [1.0; 3];
         for i in 0..3 {
-            intensity[i] = 0f32.max(normals[i] * light_dir);
+            let normal_idx = face.get_normal(i) as usize;
+            let normal = *model.normals.get(normal_idx).unwrap();
+            intensity[i] = 0f32.max(normal * light_dir);
         }
         GouradShader { varying_intensity: Vertex3::init(intensity[0], intensity[1], intensity[2]) }
     }
 }
 
 impl Shader for GouradShader {
-    fn fragment(&self, bar: Vertex3<f32>) -> image::Rgb<u8> {
+    fn fragment(&self, bar: Vertex3<f32>, pixel: image::Rgb<u8>) -> image::Rgb<u8> {
         let intensity = self.varying_intensity * bar;
         image::Rgb([
-            (255.0 * intensity) as u8,
-            (255.0 * intensity) as u8,
-            (255.0 * intensity) as u8
+            (pixel[0] as f32 * intensity) as u8,
+            (pixel[1] as f32 * intensity) as u8,
+            (pixel[2] as f32 * intensity) as u8
         ])
     }
 }
@@ -120,7 +123,7 @@ pub fn triangle<S: Shader>(verts: &[Vertex3<f32>; 3],
                 // let texture_x = p_uv.x * texture_buf_height as f32;
                 // let texture_y = p_uv.y * texture_buf_width as f32;
                 // let texture_pixel = texture_buf.get_pixel(texture_x as u32, texture_y as u32);
-                let pixel = shader.fragment(bc_screen);
+                let pixel = shader.fragment(bc_screen, image::Rgb([255u8; 3]));
                 zbuffer[zbuff_idx - 1] = p.z;
                 imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
             }
