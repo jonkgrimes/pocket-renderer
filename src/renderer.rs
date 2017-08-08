@@ -6,7 +6,7 @@ use image::{DynamicImage, RgbImage};
 use std::f32;
 
 pub trait Shader {
-    fn fragment(&self, bar: Vertex3<f32>, pixel: image::Rgb<u8>) -> image::Rgb<u8>;
+    fn fragment(&self, bar: Vertex3<f32>, pixel: &mut image::Rgb<u8>) -> bool;
 }
 
 pub struct GouradShader {
@@ -26,13 +26,12 @@ impl GouradShader {
 }
 
 impl Shader for GouradShader {
-    fn fragment(&self, bar: Vertex3<f32>, pixel: image::Rgb<u8>) -> image::Rgb<u8> {
+    fn fragment(&self, bar: Vertex3<f32>, pixel: &mut image::Rgb<u8>) -> bool {
         let intensity = self.varying_intensity * bar;
-        image::Rgb([
-            (pixel[0] as f32 * intensity) as u8,
-            (pixel[1] as f32 * intensity) as u8,
-            (pixel[2] as f32 * intensity) as u8
-        ])
+        for i in 0..3 {
+            pixel[i] = (pixel[i] as f32 * intensity) as u8;
+        }
+        true
     }
 }
 
@@ -113,17 +112,17 @@ pub fn triangle<S: Shader>(verts: &[Vertex3<f32>; 3],
             if bc_screen.x < 0.0 || bc_screen.y < 0.0 || bc_screen.z < 0.0 {
                 continue;
             }
-            // let p_uv = textures[0] * bc_screen.x + textures[1] * bc_screen.y + textures[2] * bc_screen.z;
+            let p_uv = textures[0] * bc_screen.x + textures[1] * bc_screen.y + textures[2] * bc_screen.z;
             p.z = 0.0;
             p.z += verts[0].z * bc_screen.x;
             p.z += verts[1].z * bc_screen.y;
             p.z += verts[2].z * bc_screen.z;
             let zbuff_idx = (p.x + p.y * width) as usize;
             if zbuffer[zbuff_idx - 1] < p.z {
-                // let texture_x = p_uv.x * texture_buf_height as f32;
-                // let texture_y = p_uv.y * texture_buf_width as f32;
-                // let texture_pixel = texture_buf.get_pixel(texture_x as u32, texture_y as u32);
-                let pixel = shader.fragment(bc_screen, image::Rgb([255u8; 3]));
+                let texture_x = p_uv.x * texture_buf_height as f32;
+                let texture_y = p_uv.y * texture_buf_width as f32;
+                let mut pixel = texture_buf.get_pixel(texture_x as u32, texture_y as u32).clone();
+                shader.fragment(bc_screen, &mut pixel);
                 zbuffer[zbuff_idx - 1] = p.z;
                 imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);
             }
