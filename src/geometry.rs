@@ -177,6 +177,18 @@ impl Add for Vertex2<f32> {
     }
 }
 
+impl Add for Vertex3<f32> {
+    type Output = Vertex3<f32>;
+
+    fn add(self, other: Vertex3<f32>) -> Vertex3<f32> {
+        Vertex3::<f32> {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
+}
+
 impl Sub for Vertex2<i32> {
     type Output = Vertex2<i32>;
 
@@ -326,6 +338,18 @@ impl Mul<f32> for Vertex2<f32> {
         Vertex2::<f32> {
             x: self.x * rhs,
             y: self.y * rhs,
+        }
+    }
+}
+
+impl Mul<f32> for Vertex3<f32> {
+    type Output = Vertex3<f32>;
+
+    fn mul(self, rhs: f32) -> Vertex3<f32> {
+        Vertex3::<f32> {
+            x: self.x * rhs,
+            y: self.y * rhs,
+            z: self.z * rhs,
         }
     }
 }

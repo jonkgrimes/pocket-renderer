@@ -10,18 +10,25 @@ pub trait Shader {
 }
 
 pub struct GouradShader {
-    varying_intensity: Vertex3<f32>
+    varying_intensity: Vertex3<f32>,
+    varying_uv: Matrix,
 }
 
 impl GouradShader {
     pub fn new(model: &Model, face: &Face, light_dir: Vertex3<f32>) -> GouradShader {
         let mut intensity: [f32; 3] = [1.0; 3];
+        let mut varying_uv = Matrix::new(2,3);
         for i in 0..3 {
             let normal_idx = face.get_normal(i) as usize;
+            let texture_idx = face.get_texture(i) as usize;
             let normal = *model.normals.get(normal_idx).unwrap();
+            let texture = *model.textures.get(texture_idx).unwrap();
             intensity[i] = 0f32.max(normal * light_dir);
         }
-        GouradShader { varying_intensity: Vertex3::init(intensity[0], intensity[1], intensity[2]) }
+        GouradShader { 
+            varying_intensity: Vertex3::init(intensity[0], intensity[1], intensity[2]),
+            varying_uv: varying_uv,
+        }
     }
 }
 
@@ -68,7 +75,7 @@ pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix {
 }
 
 pub fn triangle<S: Shader>(verts: &[Vertex3<f32>; 3],
-                textures: &[Vertex2<f32>; 3],
+                textures: &[Vertex3<f32>; 3],
                 shader: S,
                 texture_map: &DynamicImage,
                 zbuffer: &mut [f32],
@@ -112,7 +119,7 @@ pub fn triangle<S: Shader>(verts: &[Vertex3<f32>; 3],
             if bc_screen.x < 0.0 || bc_screen.y < 0.0 || bc_screen.z < 0.0 {
                 continue;
             }
-            let p_uv = textures[0] * bc_screen.x + textures[1] * bc_screen.y + textures[2] * bc_screen.z;
+            let p_uv = (textures[0] * bc_screen.x) + (textures[1] * bc_screen.y) + (textures[2] * bc_screen.z);
             p.z = 0.0;
             p.z += verts[0].z * bc_screen.x;
             p.z += verts[1].z * bc_screen.y;

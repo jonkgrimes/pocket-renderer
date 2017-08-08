@@ -14,7 +14,7 @@ use geometry::Vertex3;
 
 pub struct Model {
     pub verts: Vec<Vertex3<f32>>,
-    pub textures: Vec<Vertex2<f32>>,
+    pub textures: Vec<Vertex3<f32>>,
     pub normals: Vec<Vertex3<f32>>,
     pub faces: Vec<Face>,
     pub texture_image: DynamicImage,
@@ -52,7 +52,7 @@ impl Face {
 impl Model {
     pub fn new(path: &str) -> Model {
         let mut verts: Vec<Vertex3<f32>> = Vec::new();
-        let mut textures: Vec<Vertex2<f32>> = Vec::new();
+        let mut textures: Vec<Vertex3<f32>> = Vec::new();
         let mut normals: Vec<Vertex3<f32>> = Vec::new();
         let mut faces: Vec<Face> = Vec::new();
         let file = File::open(Path::new(&format!("models/{}.obj", path)));
@@ -83,7 +83,7 @@ impl Model {
             if values[0] == "vt" {
                 let x: f32 = values[2].parse().unwrap();
                 let y: f32 = values[3].parse().unwrap();
-                textures.push(Vertex2 { x: x, y: y });
+                textures.push(Vertex3 { x: x, y: y, z: 0.0 });
             }
 
             if values[0] == "vn" {
