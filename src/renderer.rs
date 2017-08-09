@@ -2,7 +2,7 @@ extern crate image;
 
 use geometry::{Vertex2, Vertex3, Matrix};
 use model::{Model,Face};
-use image::{DynamicImage, RgbImage};
+use image::RgbImage;
 use std::f32;
 
 pub trait Shader {
@@ -80,14 +80,10 @@ pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix {
 
 pub fn triangle<S: Shader>(verts: &[Vertex3<f32>; 3],
                 shader: S,
-                texture_map: &DynamicImage,
                 zbuffer: &mut [f32],
                 imgbuf: &mut RgbImage) {
     let height = (imgbuf.height() - 1) as f32;
     let width = (imgbuf.width() - 1) as f32;
-    let texture_buf = texture_map.as_rgb8().unwrap();
-    let texture_buf_height = texture_buf.height();
-    let texture_buf_width  = texture_buf.width();
     let mut bboxmin = Vertex2::<f32> {
         x: f32::INFINITY,
         y: f32::INFINITY,

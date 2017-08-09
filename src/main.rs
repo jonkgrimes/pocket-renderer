@@ -5,7 +5,7 @@ use std::path::Path;
 use std::f32;
 use image::ImageBuffer;
 use model::Model;
-use geometry::{Vertex2, Vertex3};
+use geometry::Vertex3;
 use renderer::GouradShader;
 
 pub mod model;
@@ -38,7 +38,6 @@ fn main() {
 
         for i in 0..3 {
             let vertex_index = face.get_vertex(i) as usize;
-            let texture_index = face.get_texture(i) as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
             screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone()  * world_coords[i].to_matrix()).to_vector();
         }
@@ -46,7 +45,6 @@ fn main() {
 
         renderer::triangle(&screen_coords,
                            shader,
-                           &model.texture_image,
                            &mut zbuffer,
                            &mut imgbuf)
     }

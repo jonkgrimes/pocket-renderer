@@ -9,7 +9,6 @@ use std::ops::Deref;
 use std::f32;
 use image::DynamicImage;
 
-use geometry::Vertex2;
 use geometry::Vertex3;
 
 pub struct Model {
