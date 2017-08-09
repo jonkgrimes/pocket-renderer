@@ -9,34 +9,38 @@ pub trait Shader {
     fn fragment(&self, bar: Vertex3<f32>, pixel: &mut image::Rgb<u8>) -> bool;
 }
 
-pub struct GouradShader {
+pub struct GouradShader<'a> {
     varying_intensity: Vertex3<f32>,
-    varying_uv: Matrix,
+    varying_uv: [Vertex3<f32>; 3],
+    model: &'a Model,
 }
 
-impl GouradShader {
-    pub fn new(model: &Model, face: &Face, light_dir: Vertex3<f32>) -> GouradShader {
+impl<'a> GouradShader<'a> {
+    pub fn new(model: &'a Model, face: &Face, light_dir: Vertex3<f32>) -> GouradShader<'a> {
         let mut intensity: [f32; 3] = [1.0; 3];
-        let mut varying_uv = Matrix::new(2,3);
+        let mut textures = [Vertex3::new(); 3];
         for i in 0..3 {
             let normal_idx = face.get_normal(i) as usize;
             let texture_idx = face.get_texture(i) as usize;
             let normal = *model.normals.get(normal_idx).unwrap();
-            let texture = *model.textures.get(texture_idx).unwrap();
+            textures[i] = *model.textures.get(texture_idx).unwrap();
             intensity[i] = 0f32.max(normal * light_dir);
         }
         GouradShader { 
             varying_intensity: Vertex3::init(intensity[0], intensity[1], intensity[2]),
-            varying_uv: varying_uv,
+            varying_uv: textures,
+            model: model,
         }
     }
 }
 
-impl Shader for GouradShader {
+impl<'a> Shader for GouradShader<'a> {
     fn fragment(&self, bar: Vertex3<f32>, pixel: &mut image::Rgb<u8>) -> bool {
         let intensity = self.varying_intensity * bar;
+        let uv = (self.varying_uv[0] * bar.x) + (self.varying_uv[1] * bar.y) + (self.varying_uv[2] * bar.z);
+        let texture_pixel = self.model.uv(uv);
         for i in 0..3 {
-            pixel[i] = (pixel[i] as f32 * intensity) as u8;
+            pixel[i] = (texture_pixel[i] as f32 * intensity) as u8;
         }
         true
     }
@@ -75,7 +79,6 @@ pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix {
 }
 
 pub fn triangle<S: Shader>(verts: &[Vertex3<f32>; 3],
-                textures: &[Vertex3<f32>; 3],
                 shader: S,
                 texture_map: &DynamicImage,
                 zbuffer: &mut [f32],
@@ -119,16 +122,13 @@ pub fn triangle<S: Shader>(verts: &[Vertex3<f32>; 3],
             if bc_screen.x < 0.0 || bc_screen.y < 0.0 || bc_screen.z < 0.0 {
                 continue;
             }
-            let p_uv = (textures[0] * bc_screen.x) + (textures[1] * bc_screen.y) + (textures[2] * bc_screen.z);
             p.z = 0.0;
             p.z += verts[0].z * bc_screen.x;
             p.z += verts[1].z * bc_screen.y;
             p.z += verts[2].z * bc_screen.z;
             let zbuff_idx = (p.x + p.y * width) as usize;
             if zbuffer[zbuff_idx - 1] < p.z {
-                let texture_x = p_uv.x * texture_buf_height as f32;
-                let texture_y = p_uv.y * texture_buf_width as f32;
-                let mut pixel = texture_buf.get_pixel(texture_x as u32, texture_y as u32).clone();
+                let mut pixel = image::Rgb([255u8; 3]);
                 shader.fragment(bc_screen, &mut pixel);
                 zbuffer[zbuff_idx - 1] = p.z;
                 imgbuf.put_pixel(p.x as u32, p.y as u32, pixel);

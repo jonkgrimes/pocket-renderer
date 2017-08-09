@@ -118,8 +118,8 @@ impl Model {
         }
     }
 
-    pub fn uv(&self, uv: Vertex2<f32>) -> &image::Rgba<u8> {
-        let imgbuf = self.texture_image.as_rgba8().unwrap();
+    pub fn uv(&self, uv: Vertex3<f32>) -> &image::Rgb<u8> {
+        let imgbuf = self.texture_image.as_rgb8().unwrap();
         let height = imgbuf.height();
         let width = imgbuf.width();
         imgbuf.get_pixel(uv.x as u32 * height, uv.y as u32 * width)

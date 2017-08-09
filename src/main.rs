@@ -35,19 +35,16 @@ fn main() {
     for face in model.faces.clone() {
         let mut screen_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
         let mut world_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
-        let mut texture_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
 
         for i in 0..3 {
             let vertex_index = face.get_vertex(i) as usize;
             let texture_index = face.get_texture(i) as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
-            texture_coords[i] = *model.textures.get(texture_index).unwrap();
             screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone()  * world_coords[i].to_matrix()).to_vector();
         }
         let shader = GouradShader::new(&model, &face, light_dir);
 
         renderer::triangle(&screen_coords,
-                           &texture_coords,
                            shader,
                            &model.texture_image,
                            &mut zbuffer,
