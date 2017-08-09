@@ -1,7 +1,8 @@
+use std::fmt;
+use std::f32;
 use std::ops::Add;
 use std::ops::Mul;
 use std::ops::Sub;
-use std::f32;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vertex3<T> {
@@ -357,6 +358,12 @@ impl Mul<f32> for Vertex3<f32> {
 impl PartialEq for Vertex2<i32> {
     fn eq(&self, other: &Self) -> bool {
         self.x == other.x && self.y == other.y
+    }
+}
+
+impl fmt::Display for Vertex3<f32> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "({}, {}, {})", self.x, self.y, self.z)
     }
 }
 

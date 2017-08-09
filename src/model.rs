@@ -119,9 +119,9 @@ impl Model {
 
     pub fn uv(&self, uv: Vertex3<f32>) -> &image::Rgb<u8> {
         let imgbuf = self.texture_image.as_rgb8().unwrap();
-        let height = imgbuf.height();
-        let width = imgbuf.width();
-        imgbuf.get_pixel(uv.x as u32 * height, uv.y as u32 * width)
+        let x = (uv.x * imgbuf.height() as f32) as u32;
+        let y = (uv.y * imgbuf.width() as f32) as u32;
+        imgbuf.get_pixel(x, y)
     }
 
     pub fn verts_len(&self) -> usize {
