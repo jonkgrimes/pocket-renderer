@@ -22,13 +22,15 @@ fn main() {
     let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
     let model = Model::new("african_head");
     let light_dir = Vertex3::init(1.0, 1.0, 1.0).normalize();
-    let up =        Vertex3::init(0.0, 1.0, 0.0);
-    let eye =       Vertex3::init(1.0, 1.0, 3.0);
-    let center =    Vertex3::new();
+    let up = Vertex3::init(0.0, 1.0, 0.0);
+    let eye = Vertex3::init(1.0, 1.0, 3.0);
+    let center = Vertex3::new();
 
     let projection = renderer::projection(eye, center);
-    let viewport = renderer::viewport(WIDTH / 8, HEIGHT / 8, WIDTH * 3/4, HEIGHT * 3/4, DEPTH);
+    let viewport = renderer::viewport(WIDTH / 8, HEIGHT / 8, WIDTH * 3 / 4, HEIGHT * 3 / 4, DEPTH);
     let model_view = renderer::lookat(eye, center, up);
+    let uniform_m = projection.clone() * model_view.clone();
+    let uniform_mit = uniform_m.invert_transpose();
 
     let mut zbuffer: [f32; ZBUFFER_SIZE] = [f32::NEG_INFINITY; ZBUFFER_SIZE];
 
@@ -39,14 +41,13 @@ fn main() {
         for i in 0..3 {
             let vertex_index = face.get_vertex(i) as usize;
             world_coords[i] = *model.verts.get(vertex_index).unwrap();
-            screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone()  * world_coords[i].to_matrix()).to_vector();
+            screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone() *
+                                world_coords[i].to_matrix())
+                .to_vector();
         }
         let shader = GouradShader::new(&model, &face, light_dir);
 
-        renderer::triangle(&screen_coords,
-                           shader,
-                           &mut zbuffer,
-                           &mut imgbuf)
+        renderer::triangle(&screen_coords, shader, &mut zbuffer, &mut imgbuf)
     }
 
     let ref mut fout = File::create(&Path::new("rendered.png")).unwrap();

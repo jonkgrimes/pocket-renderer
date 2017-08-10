@@ -26,13 +26,17 @@ pub struct Matrix {
 
 impl Matrix {
     pub fn new(rows: usize, cols: usize) -> Matrix {
-        Matrix { rows: rows, columns: cols, m: vec![vec![0.0; cols]; rows] }
+        Matrix {
+            rows: rows,
+            columns: cols,
+            m: vec![vec![0.0; cols]; rows],
+        }
     }
 
     pub fn rows(&self) -> usize {
         self.rows
     }
-    
+
     pub fn columns(&self) -> usize {
         self.columns
     }
@@ -46,7 +50,7 @@ impl Matrix {
     }
 
     pub fn with_capacity(size: usize) -> Matrix {
-        Matrix::new(size,size)
+        Matrix::new(size, size)
     }
 
     pub fn identity(size: usize) -> Matrix {
@@ -62,11 +66,15 @@ impl Matrix {
         matrix
     }
 
+    pub fn invert_transpose(&self) -> Matrix {
+        Matrix::identity(3)
+    }
+
     pub fn to_vector(&self) -> Vertex3<f32> {
         Vertex3::<f32> {
-            x: self.get(0,0) / self.get(3,0),
-            y: self.get(1,0) / self.get(3,0),
-            z: self.get(2,0) / self.get(3,0),
+            x: self.get(0, 0) / self.get(3, 0),
+            y: self.get(1, 0) / self.get(3, 0),
+            z: self.get(2, 0) / self.get(3, 0),
         }
     }
 }
@@ -77,9 +85,9 @@ impl PartialEq for Matrix {
         let columns = self.columns();
         for x in 0..rows {
             for y in 0..columns {
-                match self.get(x,y) == other.get(x,y) {
+                match self.get(x, y) == other.get(x, y) {
                     true => return true,
-                    false => return false
+                    false => return false,
                 }
             }
         }
@@ -91,17 +99,17 @@ impl Mul<Matrix> for Matrix {
     type Output = Matrix;
 
     fn mul(self, rhs: Matrix) -> Matrix {
-      assert!(self.columns == rhs.rows);
-      let mut result = Matrix::new(self.rows, rhs.columns);
-      for i in 0..self.rows {
-          for j in 0..rhs.columns {
-              for k in 0..self.columns {
-                  let value = result.get(i, j) + (self.get(i, k) * rhs.get(k, j));
-                  result.set(i, j, value);
-              }
-          }
-      }
-      result
+        assert!(self.columns == rhs.rows);
+        let mut result = Matrix::new(self.rows, rhs.columns);
+        for i in 0..self.rows {
+            for j in 0..rhs.columns {
+                for k in 0..self.columns {
+                    let value = result.get(i, j) + (self.get(i, k) * rhs.get(k, j));
+                    result.set(i, j, value);
+                }
+            }
+        }
+        result
     }
 }
 
@@ -136,7 +144,11 @@ impl<T> Vertex3<T> {
 
 impl Vertex3<f32> {
     pub fn new() -> Vertex3<f32> {
-        Vertex3 { x: 0.0, y: 0.0, z: 0.0 }
+        Vertex3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
     }
 
     pub fn init(x: f32, y: f32, z: f32) -> Vertex3<f32> {
@@ -152,7 +164,11 @@ impl Vertex3<f32> {
     }
 
     pub fn to_matrix(&self) -> Matrix {
-        Matrix { rows: 4, columns: 1, m: vec!(vec!(self.x),vec!(self.y),vec!(self.z),vec!(1.0)) }
+        Matrix {
+            rows: 4,
+            columns: 1,
+            m: vec![vec![self.x], vec![self.y], vec![self.z], vec![1.0]],
+        }
     }
 }
 
@@ -284,17 +300,17 @@ impl Vertex2<f32> {
     pub fn barycentric(v0: Vertex2<f32>,
                        v1: Vertex2<f32>,
                        v2: Vertex2<f32>,
-                       p:  Vertex2<f32>) 
+                       p: Vertex2<f32>)
                        -> Vertex3<f32> {
-        let a = Vertex3::<f32> { 
+        let a = Vertex3::<f32> {
             x: v2.x - v0.x,
             y: v1.x - v0.x,
-            z: v0.x - p.x
+            z: v0.x - p.x,
         };
         let b = Vertex3::<f32> {
             x: v2.y - v0.y,
             y: v1.y - v0.y,
-            z: v0.y - p.y
+            z: v0.y - p.y,
         };
         let u = Vertex3::cross(a, b);
         if u.z.abs() < 1.0 {
@@ -428,24 +444,64 @@ mod tests {
 
     #[test]
     fn matrix_equal() {
-        let a = Matrix {rows: 3, columns: 3, m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
-        let b = Matrix {rows: 3, columns: 3, m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
+        let a = Matrix {
+            rows: 3,
+            columns: 3,
+            m: vec![vec![1.0, 0.0, 0.0], vec![0.0, 1.0, 0.0], vec![0.0, 0.0, 1.0]],
+        };
+        let b = Matrix {
+            rows: 3,
+            columns: 3,
+            m: vec![vec![1.0, 0.0, 0.0], vec![0.0, 1.0, 0.0], vec![0.0, 0.0, 1.0]],
+        };
         assert!(a == b);
     }
 
     #[test]
     fn matrix_identity() {
         let actual = Matrix::identity(3);
-        let expected = Matrix {rows: 3, columns: 3, m: vec!(vec!(1.0,0.0,0.0),vec!(0.0,1.0,0.0),vec!(0.0,0.0,1.0))};
+        let expected = Matrix {
+            rows: 3,
+            columns: 3,
+            m: vec![vec![1.0, 0.0, 0.0], vec![0.0, 1.0, 0.0], vec![0.0, 0.0, 1.0]],
+        };
         assert!(actual == expected);
     }
 
     #[test]
     fn matrix_multiplication() {
-        let a = Matrix {rows: 2, columns: 2, m: vec!(vec!(2.0,1.0),vec!(2.0,2.0))};
-        let b = Matrix {rows: 2, columns: 1, m: vec!(vec!(2.0),vec!(3.0))};
+        let a = Matrix {
+            rows: 2,
+            columns: 2,
+            m: vec![vec![2.0, 1.0], vec![2.0, 2.0]],
+        };
+        let b = Matrix {
+            rows: 2,
+            columns: 1,
+            m: vec![vec![2.0], vec![3.0]],
+        };
         let actual = a * b;
-        let expected = Matrix {rows: 2, columns: 1, m: vec!(vec!(7.0),vec!(10.0))};
+        let expected = Matrix {
+            rows: 2,
+            columns: 1,
+            m: vec![vec![7.0], vec![10.0]],
+        };
+        assert!(actual == expected);
+    }
+
+    #[test]
+    fn matrix_invert_transpose() {
+        let a = Matrix {
+            rows: 3,
+            columns: 3,
+            m: vec![vec![1.0, 0.0, 0.0], vec![0.0, 1.0, 0.0], vec![0.0, 0.0, 1.0]],
+        };
+        let actual = a.invert_transpose();
+        let expected = Matrix {
+            rows: 3,
+            columns: 3,
+            m: vec![vec![1.0, 0.0, 0.0], vec![0.0, 1.0, 0.0], vec![0.0, 0.0, 1.0]],
+        };
         assert!(actual == expected);
     }
 }

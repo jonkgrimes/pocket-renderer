@@ -1,13 +1,15 @@
 extern crate image;
 
 use geometry::{Vertex2, Vertex3, Matrix};
-use model::{Model,Face};
+use model::{Model, Face};
 use image::RgbImage;
 use std::f32;
 
 pub trait Shader {
     fn fragment(&self, bar: Vertex3<f32>, pixel: &mut image::Rgb<u8>) -> bool;
 }
+
+pub struct Scene {}
 
 pub struct GouradShader<'a> {
     varying_intensity: Vertex3<f32>,
@@ -26,7 +28,7 @@ impl<'a> GouradShader<'a> {
             textures[i] = *model.textures.get(texture_idx).unwrap();
             intensity[i] = 0f32.max(normal * light_dir);
         }
-        GouradShader { 
+        GouradShader {
             varying_intensity: Vertex3::init(intensity[0], intensity[1], intensity[2]),
             varying_uv: textures,
             model: model,
@@ -37,7 +39,8 @@ impl<'a> GouradShader<'a> {
 impl<'a> Shader for GouradShader<'a> {
     fn fragment(&self, bar: Vertex3<f32>, pixel: &mut image::Rgb<u8>) -> bool {
         let intensity = self.varying_intensity * bar;
-        let uv = (self.varying_uv[0] * bar.x) + (self.varying_uv[1] * bar.y) + (self.varying_uv[2] * bar.z);
+        let uv = (self.varying_uv[0] * bar.x) + (self.varying_uv[1] * bar.y) +
+                 (self.varying_uv[2] * bar.z);
         let texture_pixel = self.model.uv(uv);
         for i in 0..3 {
             pixel[i] = (texture_pixel[i] as f32 * intensity) as u8;
@@ -61,27 +64,27 @@ pub fn lookat(eye: Vertex3<f32>, center: Vertex3<f32>, up: Vertex3<f32>) -> Matr
 }
 
 pub fn projection(eye: Vertex3<f32>, center: Vertex3<f32>) -> Matrix {
-  let mut result = Matrix::identity(4);   
-  result.set(3, 2, -1.0 / ((eye - center).norm()));
-  result
+    let mut result = Matrix::identity(4);
+    result.set(3, 2, -1.0 / ((eye - center).norm()));
+    result
 }
 
 pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix {
     let mut m = Matrix::identity(4);
-    m.set(0,3, (x + w) as f32 / 2.0);
-    m.set(1,3, (y + h) as f32 / 2.0);
-    m.set(2,3, depth as f32 / 2.0);
+    m.set(0, 3, (x + w) as f32 / 2.0);
+    m.set(1, 3, (y + h) as f32 / 2.0);
+    m.set(2, 3, depth as f32 / 2.0);
 
-    m.set(0,0, w as f32 / 2.0);
-    m.set(1,1, h as f32 / 2.0);
-    m.set(2,2, depth as f32 /2.0);
+    m.set(0, 0, w as f32 / 2.0);
+    m.set(1, 1, h as f32 / 2.0);
+    m.set(2, 2, depth as f32 / 2.0);
     m
 }
 
 pub fn triangle<S: Shader>(verts: &[Vertex3<f32>; 3],
-                shader: S,
-                zbuffer: &mut [f32],
-                imgbuf: &mut RgbImage) {
+                           shader: S,
+                           zbuffer: &mut [f32],
+                           imgbuf: &mut RgbImage) {
     let height = (imgbuf.height() - 1) as f32;
     let width = (imgbuf.width() - 1) as f32;
     let mut bboxmin = Vertex2::<f32> {

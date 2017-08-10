@@ -23,7 +23,7 @@ pub struct Model {
 pub struct Face {
     pub vertexes: [u32; 3],
     pub textures: [u32; 3],
-    pub normals:  [u32; 3],
+    pub normals: [u32; 3],
 }
 
 impl Deref for Model {
@@ -42,7 +42,7 @@ impl Face {
     pub fn get_texture(&self, i: usize) -> u32 {
         self.textures[i]
     }
-    
+
     pub fn get_normal(&self, i: usize) -> u32 {
         self.normals[i]
     }
@@ -61,10 +61,8 @@ impl Model {
             Ok(file) => {
                 println!("Loaded texture file...");
                 file.flipv()
-            },
-            Err(error) => {
-                panic!("There was a problems opening the texture file: {:?}", error)
-            },
+            }
+            Err(error) => panic!("There was a problems opening the texture file: {:?}", error),
         };
         for line in buf_reader.lines() {
             let decoded_line = line.unwrap();
@@ -82,7 +80,11 @@ impl Model {
             if values[0] == "vt" {
                 let x: f32 = values[2].parse().unwrap();
                 let y: f32 = values[3].parse().unwrap();
-                textures.push(Vertex3 { x: x, y: y, z: 0.0 });
+                textures.push(Vertex3 {
+                    x: x,
+                    y: y,
+                    z: 0.0,
+                });
             }
 
             if values[0] == "vn" {
@@ -98,7 +100,7 @@ impl Model {
                 let mut face = Face {
                     vertexes: [0; 3],
                     textures: [0; 3],
-                    normals:  [0; 3],
+                    normals: [0; 3],
                 };
                 for i in 0..3 {
                     face.vertexes[i] = *parse_face_string(values[i + 1]).get(0).unwrap();
