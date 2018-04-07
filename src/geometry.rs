@@ -172,22 +172,11 @@ impl Vertex3<f32> {
     }
 }
 
-impl Add for Vertex2<i32> {
-    type Output = Vertex2<i32>;
+impl<T: Add<Output = T>> Add for Vertex2<T> {
+    type Output = Vertex2<T>;
 
-    fn add(self, other: Vertex2<i32>) -> Vertex2<i32> {
-        Vertex2::<i32> {
-            x: self.x + other.x,
-            y: self.y + other.y,
-        }
-    }
-}
-
-impl Add for Vertex2<f32> {
-    type Output = Vertex2<f32>;
-
-    fn add(self, other: Vertex2<f32>) -> Vertex2<f32> {
-        Vertex2::<f32> {
+    fn add(self, other: Vertex2<T>) -> Vertex2<T> {
+        Vertex2::<T> {
             x: self.x + other.x,
             y: self.y + other.y,
         }

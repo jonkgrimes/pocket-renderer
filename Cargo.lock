@@ -1,12 +1,3 @@
-[root]
-name = "pocket-renderer"
-version = "0.1.0"
-dependencies = [
- "bencher 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "image 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "rand 0.3.16 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
 [[package]]
 name = "adler32"
 version = "1.0.0"
@@ -205,6 +196,15 @@ dependencies = [
  "deflate 0.7.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "inflate 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-iter 0.1.34 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "pocket-renderer"
+version = "0.1.0"
+dependencies = [
+ "bencher 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "image 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.3.16 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
