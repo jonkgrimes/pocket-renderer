@@ -137,6 +137,7 @@ pub fn triangle<S: Shader>(
                 zbuffer[zbuff_idx - 1] = p.z;
                 canvas.set_draw_color(pixel);
                 canvas.draw_point(Point::new(p.x as i32, p.y as i32)).ok();
+                canvas.present();
             }
         }
     }
