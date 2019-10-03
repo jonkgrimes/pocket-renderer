@@ -1,11 +1,11 @@
 extern crate image;
 
-use geometry::{Vertex2, Vertex3, Matrix};
-use model::{Model, Face};
+use geometry::{Matrix, Vertex2, Vertex3};
 use image::RgbImage;
-use sdl2::render::WindowCanvas;
+use model::{Face, Model};
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
+use sdl2::render::WindowCanvas;
 use std::f32;
 
 pub trait Shader {
@@ -42,8 +42,9 @@ impl<'a> GouradShader<'a> {
 impl<'a> Shader for GouradShader<'a> {
     fn fragment(&self, bar: Vertex3<f32>, pixel: &mut Color) -> bool {
         let intensity = self.varying_intensity * bar;
-        let uv = (self.varying_uv[0] * bar.x) + (self.varying_uv[1] * bar.y) +
-                 (self.varying_uv[2] * bar.z);
+        let uv = (self.varying_uv[0] * bar.x)
+            + (self.varying_uv[1] * bar.y)
+            + (self.varying_uv[2] * bar.z);
         let texture_pixel = self.model.uv(uv);
         pixel.r = (texture_pixel[0] as f32 * intensity) as u8;
         pixel.g = (texture_pixel[1] as f32 * intensity) as u8;
@@ -84,11 +85,13 @@ pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix {
     m
 }
 
-pub fn triangle<S: Shader>(verts: &[Vertex3<f32>; 3],
-                           shader: S,
-                           zbuffer: &mut [f32],
-                           canvas: &mut WindowCanvas) {
-    let (height, width) = canvas.logical_size();
+pub fn triangle<S: Shader>(
+    verts: &[Vertex3<f32>; 3],
+    shader: S,
+    zbuffer: &mut [f32],
+    canvas: &mut WindowCanvas,
+) {
+    let (height, width) = canvas.output_size().unwrap();
     let mut bboxmin = Vertex2::<f32> {
         x: f32::INFINITY,
         y: f32::INFINITY,
@@ -133,7 +136,7 @@ pub fn triangle<S: Shader>(verts: &[Vertex3<f32>; 3],
                 shader.fragment(bc_screen, &mut pixel);
                 zbuffer[zbuff_idx - 1] = p.z;
                 canvas.set_draw_color(pixel);
-                canvas.draw_point(Point::new(p.x as i32, p.y as i32));
+                canvas.draw_point(Point::new(p.x as i32, p.y as i32)).ok();
             }
         }
     }

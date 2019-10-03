@@ -83,23 +83,18 @@ fn main() {
             for i in 0..3 {
                 let vertex_index = face.get_vertex(i) as usize;
                 world_coords[i] = *model.verts.get(vertex_index).unwrap();
-                screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone() *
-                                    world_coords[i].to_matrix())
-                    .to_vector();
+                screen_coords[i] = (viewport.clone()
+                    * projection.clone()
+                    * model_view.clone()
+                    * world_coords[i].to_matrix())
+                .to_vector();
             }
             let shader = GouradShader::new(&model, &face, light_dir);
 
             renderer::triangle(&screen_coords, shader, &mut zbuffer, &mut canvas)
         }
 
-
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
-    // +1 hack to get over the out of bounds errors
-    /*     let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
-
-
-    let ref mut fout = File::create(&Path::new("rendered.png")).unwrap();
-    let _ = image::ImageRgb8(image::imageops::flip_vertical(&imgbuf)).save(fout, image::PNG); */
 }
