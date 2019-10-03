@@ -1,13 +1,13 @@
 extern crate image;
 
-use std::path::Path;
-use std::fs::File;
-use std::io::BufReader;
-use std::io::prelude::*;
-use std::vec::Vec;
-use std::ops::Deref;
-use std::f32;
 use image::DynamicImage;
+use std::f32;
+use std::fs::File;
+use std::io::prelude::*;
+use std::io::BufReader;
+use std::ops::Deref;
+use std::path::Path;
+use std::vec::Vec;
 
 use geometry::Vertex3;
 
@@ -19,7 +19,7 @@ pub struct Model {
     pub texture_image: DynamicImage,
 }
 
-#[derive(Debug,Copy,Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct Face {
     pub vertexes: [u32; 3],
     pub textures: [u32; 3],
@@ -80,11 +80,7 @@ impl Model {
             if values[0] == "vt" {
                 let x: f32 = values[2].parse().unwrap();
                 let y: f32 = values[3].parse().unwrap();
-                textures.push(Vertex3 {
-                    x: x,
-                    y: y,
-                    z: 0.0,
-                });
+                textures.push(Vertex3 { x: x, y: y, z: 0.0 });
             }
 
             if values[0] == "vn" {

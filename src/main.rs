@@ -1,15 +1,20 @@
 extern crate image;
+extern crate sdl2;
 
+use sdl2::event::Event;
+use sdl2::keyboard::Keycode;
+use sdl2::pixels::Color;
+use std::time::Duration;
+
+use geometry::Vertex3;
+use model::Model;
+use renderer::GouradShader;
+use std::f32;
 use std::fs::File;
 use std::path::Path;
-use std::f32;
-use image::ImageBuffer;
-use model::Model;
-use geometry::Vertex3;
-use renderer::GouradShader;
 
-pub mod model;
 pub mod geometry;
+pub mod model;
 pub mod renderer;
 
 const WIDTH: u32 = 800;
@@ -18,8 +23,25 @@ const DEPTH: u32 = 255;
 const ZBUFFER_SIZE: usize = ((WIDTH + 1) * (HEIGHT + 1)) as usize;
 
 fn main() {
-    // +1 hack to get over the out of bounds errors
-    let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
+    let sdl_context = sdl2::init().unwrap();
+    let video_subsystem = sdl_context.video().unwrap();
+
+    let window = video_subsystem
+        .window("pocket-renderer", 1024, 768)
+        .position_centered()
+        .build()
+        .unwrap();
+    let mut canvas = window.into_canvas().build().unwrap();
+
+    // Draw a black canvas
+    canvas.set_draw_color(Color::RGB(0, 0, 0));
+    canvas.clear();
+    canvas.present();
+
+    // Setup event pump
+    let mut event_pump = sdl_context.event_pump().unwrap();
+
+    // Load the model
     let model = Model::new("african_head");
     let light_dir = Vertex3::init(1.0, 1.0, 1.0).normalize();
     let up = Vertex3::init(0.0, 1.0, 0.0);
@@ -34,22 +56,50 @@ fn main() {
 
     let mut zbuffer: [f32; ZBUFFER_SIZE] = [f32::NEG_INFINITY; ZBUFFER_SIZE];
 
-    for face in model.faces.clone() {
-        let mut screen_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
-        let mut world_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
-
-        for i in 0..3 {
-            let vertex_index = face.get_vertex(i) as usize;
-            world_coords[i] = *model.verts.get(vertex_index).unwrap();
-            screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone() *
-                                world_coords[i].to_matrix())
-                .to_vector();
+    // event loop
+    'running: loop {
+        for event in event_pump.poll_iter() {
+            match event {
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break 'running,
+                Event::KeyDown {
+                    keycode: Some(Keycode::Up),
+                    ..
+                } => {
+                    println!("Up arrow key pressed");
+                }
+                _ => {}
+            }
         }
-        let shader = GouradShader::new(&model, &face, light_dir);
 
-        renderer::triangle(&screen_coords, shader, &mut zbuffer, &mut imgbuf)
+        // draw stuff
+        for face in model.faces.clone() {
+            let mut screen_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
+            let mut world_coords: [Vertex3<f32>; 3] = [Vertex3::new(); 3];
+
+            for i in 0..3 {
+                let vertex_index = face.get_vertex(i) as usize;
+                world_coords[i] = *model.verts.get(vertex_index).unwrap();
+                screen_coords[i] = (viewport.clone() * projection.clone() * model_view.clone() *
+                                    world_coords[i].to_matrix())
+                    .to_vector();
+            }
+            let shader = GouradShader::new(&model, &face, light_dir);
+
+            renderer::triangle(&screen_coords, shader, &mut zbuffer, &mut canvas)
+        }
+
+
+        canvas.present();
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
+    // +1 hack to get over the out of bounds errors
+    /*     let mut imgbuf = ImageBuffer::new(WIDTH + 1, HEIGHT + 1);
+
 
     let ref mut fout = File::create(&Path::new("rendered.png")).unwrap();
-    let _ = image::ImageRgb8(image::imageops::flip_vertical(&imgbuf)).save(fout, image::PNG);
+    let _ = image::ImageRgb8(image::imageops::flip_vertical(&imgbuf)).save(fout, image::PNG); */
 }
