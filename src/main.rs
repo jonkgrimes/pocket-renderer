@@ -29,6 +29,7 @@ fn main() {
     let window = video_subsystem
         .window("pocket-renderer", 1024, 768)
         .position_centered()
+        .opengl()
         .build()
         .unwrap();
     let mut canvas = window.into_canvas().build().unwrap();
@@ -95,6 +96,5 @@ fn main() {
         }
 
         canvas.present();
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
     }
 }

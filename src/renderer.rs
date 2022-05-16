@@ -131,13 +131,12 @@ pub fn triangle<S: Shader>(
             p.z += verts[1].z * bc_screen.y;
             p.z += verts[2].z * bc_screen.z;
             let zbuff_idx = (p.x + p.y * (width as f32)) as usize;
-            if zbuffer[zbuff_idx - 1] < p.z {
+            if zbuffer[zbuff_idx - 1] <= p.z {
                 let mut pixel = Color::RGB(255u8, 255u8, 255u8);
                 shader.fragment(bc_screen, &mut pixel);
                 zbuffer[zbuff_idx - 1] = p.z;
                 canvas.set_draw_color(pixel);
                 canvas.draw_point(Point::new(p.x as i32, p.y as i32)).ok();
-                canvas.present();
             }
         }
     }
