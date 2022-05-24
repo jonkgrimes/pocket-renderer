@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate bencher;
 extern crate image;
-extern crate renderer;
 
 use std::fs::File;
 use std::path::Path;

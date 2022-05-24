@@ -1,7 +1,6 @@
 extern crate image;
 
-use geometry::{Matrix, Vertex2, Vertex3};
-use image::RgbImage;
+use geometry::{Matrix4, Vertex2, Vertex3};
 use model::{Face, Model};
 use sdl2::pixels::Color;
 use sdl2::rect::Point;
@@ -53,11 +52,11 @@ impl<'a> Shader for GouradShader<'a> {
     }
 }
 
-pub fn lookat(eye: Vertex3<f32>, center: Vertex3<f32>, up: Vertex3<f32>) -> Matrix {
+pub fn lookat(eye: Vertex3<f32>, center: Vertex3<f32>, up: Vertex3<f32>) -> Matrix4 {
     let z = (eye - center).normalize();
     let x = Vertex3::cross(up, z).normalize();
     let y = Vertex3::cross(z, x).normalize();
-    let mut result = Matrix::identity(4);
+    let mut result = Matrix4::identity();
     for i in 0..3 {
         result.set(0, i, *x.at(i as i32).unwrap());
         result.set(1, i, *y.at(i as i32).unwrap());
@@ -67,14 +66,14 @@ pub fn lookat(eye: Vertex3<f32>, center: Vertex3<f32>, up: Vertex3<f32>) -> Matr
     result
 }
 
-pub fn projection(eye: Vertex3<f32>, center: Vertex3<f32>) -> Matrix {
-    let mut result = Matrix::identity(4);
+pub fn projection(eye: Vertex3<f32>, center: Vertex3<f32>) -> Matrix4 {
+    let mut result = Matrix4::identity();
     result.set(3, 2, -1.0 / ((eye - center).norm()));
     result
 }
 
-pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix {
-    let mut m = Matrix::identity(4);
+pub fn viewport(x: u32, y: u32, h: u32, w: u32, depth: u32) -> Matrix4 {
+    let mut m = Matrix4::identity();
     m.set(0, 3, (x + w) as f32 / 2.0);
     m.set(1, 3, (y + h) as f32 / 2.0);
     m.set(2, 3, depth as f32 / 2.0);
@@ -90,7 +89,7 @@ pub fn triangle<S: Shader>(
     shader: S,
     zbuffer: &mut [f32],
     canvas: &mut WindowCanvas,
-) {
+) -> i32 {
     let (height, width) = canvas.output_size().unwrap();
     let mut bboxmin = Vertex2::<f32> {
         x: f32::INFINITY,
@@ -118,6 +117,8 @@ pub fn triangle<S: Shader>(
         z: 0.0,
     };
 
+    let mut render_count = 0;
+
     for x in (bboxmin.x as u32)..(bboxmax.x as u32 + 1) {
         for y in (bboxmin.y as u32)..(bboxmax.y as u32 + 1) {
             p.x = x as f32;
@@ -137,7 +138,10 @@ pub fn triangle<S: Shader>(
                 zbuffer[zbuff_idx - 1] = p.z;
                 canvas.set_draw_color(pixel);
                 canvas.draw_point(Point::new(p.x as i32, p.y as i32)).ok();
+                render_count += 1;
             }
         }
     }
+
+    render_count
 }
